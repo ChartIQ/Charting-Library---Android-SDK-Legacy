@@ -36,6 +36,16 @@ function parseData(data, callbackId) {
 	quoteFeedCb({quotes:newQuotes, moreAvailable:true, attribution:{source:"simulator", exchange:"RANDOM"}});
 }
 
+function setPeriodicity(period, interval, timeUnit) {	
+	var params = {
+		period: period,
+		interval: interval,
+		timeUnit: timeUnit
+	}
+	
+	stxx.setPeriodicity(params);
+}
+
 function callNewChartWithPeriodicity(symbol) {
 	stxx.newChart(symbol, null, null, null,
 			{periodicity:{period:stxx.layout.periodicity,interval:stxx.layout.interval}});

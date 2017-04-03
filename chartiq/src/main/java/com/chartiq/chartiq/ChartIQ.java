@@ -218,7 +218,8 @@ public class ChartIQ extends WebView {
         if (timeUnit == null) {
             timeUnit = "minute";
         }
-        this.invoke("setPeriodicityV2", period, interval, timeUnit, toastCallback);
+        String args = buildArgumentStringFromArgs(period, interval, timeUnit);
+        executeJavascript("setPeriodicity(" + args + ");", toastCallback);
         addEvent(new Event("CHIQ_setPeriodicity").set("periodicity", period).set("interval", interval));
     }
 
