@@ -7,6 +7,9 @@
 Charting-Library---Android-SDK.iml
 /app/app.iml
 /chartiq/chartiq.iml
+.gradle/*
+.idea/*
 
 # Misc
 .project
+*/.DS_Store
