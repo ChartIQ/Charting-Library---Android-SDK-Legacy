@@ -124,8 +124,7 @@ public class ChartIQ extends WebView {
                         loadUrl(chartIQUrl);
                         setWebViewClient(new WebViewClient() {
                             public void onPageFinished(WebView view, String url) {
-                                String script = "nativeQuoteFeed(parameters, cb)";
-                                executeJavascript(script, null);
+                                executeJavascript("nativeQuoteFeed(parameters, cb)", null);
 
                                 if (callbackStart != null) {
                                     callbackStart.onStart();
@@ -200,8 +199,7 @@ public class ChartIQ extends WebView {
     }
 
     public void setSymbol(String symbol) {
-        String script = "callNewChartWithPeriodicity(\"" + symbol + "\");";
-        executeJavascript(script, toastCallback);
+        executeJavascript("callNewChartWithPeriodicity(\"" + symbol + "\");", toastCallback);
         addEvent(new Event("CHIQ_setSymbol").set("symbol", symbol));
     }
 
@@ -421,16 +419,17 @@ public class ChartIQ extends WebView {
     }
 
     public void setStudyInputParameter(String studyName, String parameter, String value) {
-        String initHelper = "var helper = new STX.Studies.DialogHelper({sd:stxx.layout.studies[\"" + studyName + "\"], stx:stxx});";
-        String updateStudy = "helper.updateStudy({inputs:{" + buildArgumentStringFromArgs(parameter) + ":" + buildArgumentStringFromArgs(value) + "}, outputs:{}})";
-        executeJavascript(initHelper + updateStudy, toastCallback);
+        String args = buildArgumentStringFromArgs(studyName, parameter, value);
+        String script = "setStudyParameter(" + args + ", true);";
+        System.out.println(args);
+        executeJavascript(script, toastCallback);
         addEvent(new Event("CHIQ_setStudyParameter").set("parameter", parameter).set("value", value));
     }
 
     public void setStudyOutputParameter(String studyName, String parameter, String value) {
-        String initHelper = "var helper = new STX.Studies.DialogHelper({sd:stxx.layout.studies[\"" + studyName + "\"], stx:stxx});";
-        String updateStudy = "helper.updateStudy({inputs:{}, outputs:{" + buildArgumentStringFromArgs(parameter) + ":" + buildArgumentStringFromArgs(value) + "}})";
-        executeJavascript(initHelper + updateStudy, toastCallback);
+        String args = buildArgumentStringFromArgs(studyName, parameter, value);
+        String script = "setStudyParameter(" + args + ", false);";
+        executeJavascript(script, toastCallback);
         addEvent(new Event("CHIQ_setStudyParameter").set("parameter", parameter).set("value", value));
     }
 
@@ -557,10 +556,7 @@ public class ChartIQ extends WebView {
 
     private void invokePullCallback(String callbackId, OHLCChart[] data) {
         String json = new Gson().toJson(data);
-        System.out.println(callbackId);
-        String script = "parseData('" + json + "', \"" + callbackId + "\");";
-        System.out.println(script);
-        executeJavascript(script);
+        executeJavascript("parseData('" + json + "', \"" + callbackId + "\");");
     }
 
     private void invoke(final String methodName, final Object... args) {

@@ -141,9 +141,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //String url = "http://sstest.rokolabs.com/chartiq/template.roko.v3.html";
-        //String url = "http://192.168.1.125:8080/3.0.0/default/template-basic.html";
-
         chartIQ.start("JGPHS0Pk6St63QUBdHk5uVZDM11T2Z1d1/BFz9E8HyI=", ChartIQ.url, new ChartIQ.CallbackStart() {
             @Override
             public void onStart() {

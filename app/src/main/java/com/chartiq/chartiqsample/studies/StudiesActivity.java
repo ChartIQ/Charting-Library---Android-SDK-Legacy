@@ -68,8 +68,6 @@ public class StudiesActivity extends AppCompatActivity {
         chartIQ.getSettings().setJavaScriptEnabled(true);
         chartIQ.getSettings().setDomStorageEnabled(true);
         chartIQ.addJavascriptInterface(chartIQ, "promises");
-        //String url = "http://192.168.1.125:8080/3.0.0/default/template-basic.html";
-        //String url = "http://sstest.rokolabs.com/chartiq/template-basic.html";
         chartIQ.loadUrl(ChartIQ.url);
 
         studiesList.setOnTouchListener(new HideKeyboardOnTouchListener());
