@@ -1,0 +1,74 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'maven-publish'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0.15"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+publishing {
+    publications {
+        aar(MavenPublication) {
+            groupId = 'com.chartiq'
+            artifactId 'chartiq'
+            version = "1.0.15"
+            artifact "${project.buildDir}/outputs/aar/chartiq-release.aar"
+
+            pom.withXml {
+                def root = asNode()
+                def license = root.appendNode('licenses').appendNode('license')
+                license.appendNode('name', 'MPL, Version 2.0')
+                license.appendNode('url', 'https://www.mozilla.org/en-US/MPL/2.0/')
+                license.appendNode('distribution', 'repo')
+            }
+        }
+    }
+}
+
+artifactory {
+    contextUrl = 'https://artifactory.roko.mobi/artifactory'
+    publish {
+        repository {
+            repoKey = "libs-release-local"
+            username = "ci_mobile"
+            password = "Qk2CwD"
+            maven = true
+        }
+        defaults {
+            publishArtifacts = true
+            publications('aar')
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:2.5.0'
+    testCompile "org.robolectric:robolectric:3.0"
+    testCompile 'com.squareup.assertj:assertj-android:1.1.1'
+    testCompile 'org.mockito:mockito-core:2.+'
+    testCompile 'com.squareup.okhttp3:mockwebserver:3.5.0'
+    compile 'com.google.code.gson:gson:2.7'
+}
