@@ -1,0 +1,6 @@
+# Build output
+/build/
+/app/build/
+/chartiq/build/
+
+.project
