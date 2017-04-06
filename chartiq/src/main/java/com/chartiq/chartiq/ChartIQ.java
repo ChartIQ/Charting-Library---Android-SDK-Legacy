@@ -24,7 +24,7 @@ import java.util.Map;
 public class ChartIQ extends WebView {
     public static final String url = "http://192.168.1.31:8080/3.0.0/default/template-basic.html";
     private static final String CHART_IQ_JS_OBJECT = "stxx";
-    private static final int refreshInterval = 0;
+    private static final int refreshInterval = 1;
     public boolean disableAnalytics = false;
     private boolean showDebugInfo;
     private DataSource dataSource;
@@ -179,6 +179,8 @@ public class ChartIQ extends WebView {
             dataMethod = method;
         }
 
+        executeJavascript("determineOs();");
+
         if (dataMethod == DataMethod.PULL) {
             executeJavascript("attachQuoteFeed(" + refreshInterval + ")", null);
         } else {
@@ -243,11 +245,9 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_setAggregationType").set("aggregationType", aggregationType));
     }
 
+    // rework
     public void addComparison(String symbol, String hexColor) {
-        //String setSeriesRendererScript = "stxx.setSeriesRenderer(new CIQ.Renderer.Lines({params:{name:\"My Line Series\", type:\"line\", gaps:{pattern:[3,3]}, width:1}}))" +
-          //      ".attachSeries(\"" + symbol + "\",{color:\"" + hexColor + "\",permanent:true}).ready();";
         this.invoke("addSeries", symbol, toastCallback);
-        //executeJavascript(setSeriesRendererScript, toastCallback);
         addEvent(new Event("CHIQ_addComparison").set("symbol", symbol));
     }
 
