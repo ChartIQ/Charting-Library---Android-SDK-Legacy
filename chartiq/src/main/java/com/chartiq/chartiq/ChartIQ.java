@@ -22,9 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChartIQ extends WebView {
-    public static final String url = "http://192.168.1.31:8080/3.0.0/default/template-basic.html";
     private static final String CHART_IQ_JS_OBJECT = "stxx";
-    private static final int refreshInterval = 1;
+    public int refreshInterval = 0;
     public boolean disableAnalytics = false;
     private boolean showDebugInfo;
     private DataSource dataSource;
@@ -182,7 +181,7 @@ public class ChartIQ extends WebView {
         executeJavascript("determineOs();");
 
         if (dataMethod == DataMethod.PULL) {
-            executeJavascript("attachQuoteFeed(" + refreshInterval + ")", null);
+            executeJavascript("attachQuoteFeed(" + getRefreshInterval() + ")", null);
         } else {
             this.invoke("newChart", symbol, toastCallback);
         }
@@ -201,7 +200,7 @@ public class ChartIQ extends WebView {
     }
 
     public void setSymbol(String symbol) {
-        executeJavascript("callNewChartWithPeriodicity(\"" + symbol + "\");", toastCallback);
+        executeJavascript("callNewChart(\"" + symbol + "\");", toastCallback);
         addEvent(new Event("CHIQ_setSymbol").set("symbol", symbol));
     }
 
@@ -221,7 +220,7 @@ public class ChartIQ extends WebView {
             timeUnit = "minute";
         }
         String args = buildArgumentStringFromArgs(period, interval, timeUnit);
-        executeJavascript("setPeriodicity(" + args + ");", toastCallback);
+        executeJavascript("setPeriodicity(" + period + ", \"" + interval + "\", \"" + timeUnit + "\");", toastCallback);
         addEvent(new Event("CHIQ_setPeriodicity").set("periodicity", period).set("interval", interval));
     }
 
@@ -472,7 +471,7 @@ public class ChartIQ extends WebView {
     }
 
     @JavascriptInterface
-    public void pullInitialData(final String symbol, int period, String interval, Date start, Date end, Object meta, final String id) {
+    public void pullInitialData(final String symbol, int period, String interval, String start, String end, Object meta, final String id) {
         Map<String, Object> params = new HashMap<>();
         params.put("symbol", symbol == null ? "" : symbol);
         params.put("period", period);
@@ -501,7 +500,7 @@ public class ChartIQ extends WebView {
     }
 
     @JavascriptInterface
-    public void pullUpdate(final String symbol, int period, String interval, Date start, Object meta, final String callbackId) {
+    public void pullUpdate(final String symbol, int period, String interval, String start, Object meta, final String callbackId) {
         Map<String, Object> params = new HashMap<>();
         params.put("symbol", symbol == null ? "" : symbol);
         params.put("period", period);
@@ -528,7 +527,7 @@ public class ChartIQ extends WebView {
     }
 
     @JavascriptInterface
-    public void pullPagination(final String symbol, int period, String interval, Date start, Date end, Object meta, final String callbackId) {
+    public void pullPagination(final String symbol, int period, String interval, String start, String end, Object meta, final String callbackId) {
         Map<String, Object> params = new HashMap<>();
         params.put("symbol", symbol == null ? "" : symbol);
         params.put("period", period);
@@ -616,6 +615,14 @@ public class ChartIQ extends WebView {
         } else {
             post(runnable);
         }
+    }
+
+    public int getRefreshInterval() {
+        return this.refreshInterval;
+    }
+
+    public void setRefreshInterval(int refreshInterval) {
+        this.refreshInterval = refreshInterval;
     }
 
     ValueCallback getCallBackFromArgs(Object[] args) {

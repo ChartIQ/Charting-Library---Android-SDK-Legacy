@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int STUDIES_REQUEST_CODE = 2;
     private static final int CHART_OPTIONS_REQUEST_CODE = 3;
     private static final String defaultSymbol = "AAPL";
+    public static final String chartUrl = "http://192.168.1.125:8080/3.0.0/default/template-basic.html";
     ChartIQ chartIQ;
 
     //top toolbar
@@ -124,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         doMappings();
 
+        chartIQ.setRefreshInterval(1);
+
         chartIQ.setDataSource(new ChartIQ.DataSource() {
             @Override
             public void pullInitialData(Map<String, Object> params, ChartIQ.DataSourceCallback callback) {
@@ -141,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        chartIQ.start("JGPHS0Pk6St63QUBdHk5uVZDM11T2Z1d1/BFz9E8HyI=", ChartIQ.url, new ChartIQ.CallbackStart() {
+        chartIQ.start("JGPHS0Pk6St63QUBdHk5uVZDM11T2Z1d1/BFz9E8HyI=", chartUrl, new ChartIQ.CallbackStart() {
             @Override
             public void onStart() {
                 ChartIQ.setUser("android@chartiq.com", new ChartIQ.SetUserCallback() {

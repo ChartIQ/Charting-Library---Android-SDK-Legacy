@@ -20,6 +20,7 @@ import com.chartiq.chartiq.ChartIQ;
 import com.chartiq.chartiq.Promise;
 import com.chartiq.chartiq.model.Study;
 import com.chartiq.chartiqsample.HideKeyboardOnTouchListener;
+import com.chartiq.chartiqsample.MainActivity;
 import com.chartiq.chartiqsample.R;
 import com.chartiq.chartiqsample.Util;
 import com.chartiq.chartiqsample.ui.DividerDecoration;
@@ -68,7 +69,7 @@ public class StudiesActivity extends AppCompatActivity {
         chartIQ.getSettings().setJavaScriptEnabled(true);
         chartIQ.getSettings().setDomStorageEnabled(true);
         chartIQ.addJavascriptInterface(chartIQ, "promises");
-        chartIQ.loadUrl(ChartIQ.url);
+        chartIQ.loadUrl(MainActivity.chartUrl);
 
         studiesList.setOnTouchListener(new HideKeyboardOnTouchListener());
 
