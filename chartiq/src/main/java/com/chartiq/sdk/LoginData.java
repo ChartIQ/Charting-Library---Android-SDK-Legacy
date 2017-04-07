@@ -1,4 +1,4 @@
-package com.chartiq.chartiq;
+package com.chartiq.sdk;
 
 class LoginData {
 

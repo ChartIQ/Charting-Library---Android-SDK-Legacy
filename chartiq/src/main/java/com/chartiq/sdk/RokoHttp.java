@@ -1,12 +1,4 @@
-package com.chartiq.chartiq;
-
-import android.util.Log;
-
-import com.chartiq.chartiq.PostRequest;
-import com.chartiq.chartiq.Request;
-import com.chartiq.chartiq.RequestMethod;
-import com.chartiq.chartiq.Response;
-import com.chartiq.chartiq.ResponseCallback;
+package com.chartiq.sdk;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

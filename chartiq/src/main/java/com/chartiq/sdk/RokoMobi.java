@@ -1,4 +1,4 @@
-package com.chartiq.chartiq;
+package com.chartiq.sdk;
 
 import android.content.Context;
 import android.content.ContextWrapper;

@@ -16,22 +16,20 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.chartiq.chartiq.ChartIQ;
-import com.chartiq.chartiq.Promise;
-import com.chartiq.chartiq.model.Study;
+import com.chartiq.sdk.ChartIQ;
+import com.chartiq.sdk.Promise;
+import com.chartiq.sdk.model.Study;
 import com.chartiq.chartiqsample.HideKeyboardOnTouchListener;
 import com.chartiq.chartiqsample.MainActivity;
 import com.chartiq.chartiqsample.R;
 import com.chartiq.chartiqsample.Util;
 import com.chartiq.chartiqsample.ui.DividerDecoration;
 import com.chartiq.chartiqsample.ui.StickyHeaderDecoration;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 

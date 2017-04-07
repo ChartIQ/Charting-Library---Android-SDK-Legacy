@@ -1,4 +1,4 @@
-package com.chartiq.chartiq;
+package com.chartiq.sdk;
 
 import android.content.Context;
 import android.os.Build;
@@ -9,8 +9,8 @@ import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.chartiq.chartiq.model.OHLCChart;
-import com.chartiq.chartiq.model.Study;
+import com.chartiq.sdk.model.OHLCChart;
+import com.chartiq.sdk.model.Study;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -245,8 +245,9 @@ public class ChartIQ extends WebView {
     }
 
     // rework
-    public void addComparison(String symbol, String hexColor) {
-        this.invoke("addSeries", symbol, toastCallback);
+    public void addComparison(String symbol, String hexColor, Boolean isComparison) {
+        executeJavascript("addSeries(\"" + symbol + "\", \"" + hexColor + "\", "+ true + ");", toastCallback);
+        //this.invoke("addSeries", symbol, toastCallback);
         addEvent(new Event("CHIQ_addComparison").set("symbol", symbol));
     }
 
@@ -352,6 +353,7 @@ public class ChartIQ extends WebView {
     }
 
     public Promise<Study[]> getActiveStudies() {
+        executeJavascript("determineOs();");
         String script = "getActiveStudies();";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             final Promise<Study[]> promise = new Promise<>();

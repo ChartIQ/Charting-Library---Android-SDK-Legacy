@@ -1,4 +1,4 @@
-package com.chartiq.chartiq;
+package com.chartiq.sdk;
 
 /**
  * Created by ilya.uglov on 08.06.16.

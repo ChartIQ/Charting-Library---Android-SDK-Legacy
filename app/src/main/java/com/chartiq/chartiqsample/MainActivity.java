@@ -17,7 +17,6 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -34,11 +33,11 @@ import android.widget.ListAdapter;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.chartiq.chartiq.ChartIQ;
-import com.chartiq.chartiq.Promise;
-import com.chartiq.chartiq.User;
-import com.chartiq.chartiq.model.OHLCChart;
-import com.chartiq.chartiq.model.Study;
+import com.chartiq.sdk.ChartIQ;
+import com.chartiq.sdk.Promise;
+import com.chartiq.sdk.User;
+import com.chartiq.sdk.model.OHLCChart;
+import com.chartiq.sdk.model.Study;
 import com.chartiq.chartiqsample.studies.StudiesActivity;
 import com.google.gson.Gson;
 
@@ -64,8 +63,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int DRAW_REQUEST_CODE = 1;
     private static final int STUDIES_REQUEST_CODE = 2;
     private static final int CHART_OPTIONS_REQUEST_CODE = 3;
+    private static final int REFRESH_INTERVAL = 1;
     private static final String defaultSymbol = "AAPL";
-    public static final String chartUrl = "http://192.168.1.125:8080/3.0.0/default/template-basic.html";
+    public static final String chartUrl = "http://192.168.1.31:8080/3.0.0/default/template-native-sdk.html";
     ChartIQ chartIQ;
 
     //top toolbar
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         doMappings();
 
-        chartIQ.setRefreshInterval(1);
+        chartIQ.setRefreshInterval(REFRESH_INTERVAL);
 
         chartIQ.setDataSource(new ChartIQ.DataSource() {
             @Override

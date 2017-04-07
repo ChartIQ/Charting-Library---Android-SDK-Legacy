@@ -1,4 +1,4 @@
-package com.chartiq.chartiq.model;
+package com.chartiq.sdk.model;
 
 import java.io.Serializable;
 import java.util.Map;

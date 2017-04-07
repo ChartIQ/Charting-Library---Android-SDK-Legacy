@@ -19,7 +19,7 @@ import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.chartiq.chartiq.model.Study;
+import com.chartiq.sdk.model.Study;
 import com.chartiq.chartiqsample.ColorAdapter;
 import com.chartiq.chartiqsample.R;
 import com.google.gson.Gson;
@@ -70,6 +70,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
         }
 
         if (getIntent().hasExtra("inputs")) {
+            System.out.println(getIntent().getStringExtra("inputs").getClass());
             inputs = new Gson().fromJson(getIntent().getStringExtra("inputs"), StudyParameter[].class);
             if (study.inputs != null) {
                 bindStudyOptions(inputs, study.inputs);

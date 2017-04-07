@@ -1,4 +1,4 @@
-package com.chartiq.chartiq;
+package com.chartiq.sdk;
 
 import java.io.Serializable;
 import java.util.ArrayList;

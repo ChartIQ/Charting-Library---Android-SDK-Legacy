@@ -1,4 +1,4 @@
-package com.chartiq.chartiq;
+package com.chartiq.sdk;
 
 import java.io.BufferedReader;
 import java.io.IOException;
