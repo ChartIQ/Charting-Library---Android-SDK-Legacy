@@ -423,7 +423,6 @@ public class ChartIQ extends WebView {
     public void setStudyInputParameter(String studyName, String parameter, String value) {
         String args = buildArgumentStringFromArgs(studyName, parameter, value);
         String script = "setStudyParameter(" + args + ", true);";
-        System.out.println(args);
         executeJavascript(script, toastCallback);
         addEvent(new Event("CHIQ_setStudyParameter").set("parameter", parameter).set("value", value));
     }

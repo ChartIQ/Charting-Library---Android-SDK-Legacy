@@ -29,7 +29,7 @@ publishing {
             groupId = 'com.chartiq'
             artifactId 'chartiq'
             version = "1.0.15"
-            artifact "${project.buildDir}/outputs/aar/chartiq-sdk.aar"
+            artifact "${project.buildDir}/outputs/aar/chartiq-release.aar"
 
             pom.withXml {
                 def root = asNode()
