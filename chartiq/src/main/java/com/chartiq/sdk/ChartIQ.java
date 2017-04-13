@@ -48,18 +48,88 @@ public class ChartIQ extends WebView {
     private ArrayList<OnPullUpdateCallback> onPullUpdate = new ArrayList<>();
     private ArrayList<OnPullPaginationCallback> onPullPagination = new ArrayList<>();
     private ArrayList<Promise> promises = new ArrayList<>();
+    
+    GestureDetector gd;
+    private AccessibilityManager mAccessibilityManager;
 
     public ChartIQ(Context context) {
         super(context);
+        gd = new GestureDetector(context, sogl);
     }
 
     public ChartIQ(Context context, AttributeSet attrs) {
         super(context, attrs);
+        gd = new GestureDetector(context, sogl);
     }
 
     public ChartIQ(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        gd = new GestureDetector(context, sogl);
     }
+    
+    private boolean swipeLeft = false;
+    private boolean swipeRight = false;
+    private static final int SWIPE_MIN_DISTANCE = 320;
+    private static final int SWIPE_MAX_OFF_PATH = 250;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        gd.onTouchEvent(event);
+        if (swipeLeft) {
+            swipeLeft = false;
+
+            executeJavascript("stxx.swipeLeft();", new ValueCallback<String>() {
+                @Override
+                public void onReceiveValue(String value) {
+                    try{
+                        swipeGesture(value);
+                    } catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            return true;
+        } else if(swipeRight){
+            swipeRight = false;
+            executeJavascript("stxx.swipeRight();", new ValueCallback<String>() {
+                @Override
+                public void onReceiveValue(String value) {
+                    try{
+                        swipeGesture(value);
+                    } catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            return true;
+        } else {
+            return super.onTouchEvent(event);
+        }
+    }
+
+    public void swipeGesture(String value){
+        this.announceForAccessibility(value);
+    }
+
+    GestureDetector.SimpleOnGestureListener sogl = new GestureDetector.SimpleOnGestureListener() {
+        public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
+            float diffY = event1.getY() - event2.getY();
+            float diffX = event1.getX() - event2.getX();
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > 100 && Math.abs(velocityX) > 1) {
+                    if (diffX > 0) {
+                        swipeLeft = true;
+                    } else {
+                        swipeRight = true;
+                    }
+                }
+            }
+
+            return true;
+        }
+    };
 
     public static void setUser(String userName) {
         RokoMobi.setUser(userName);
@@ -123,7 +193,6 @@ public class ChartIQ extends WebView {
                         loadUrl(chartIQUrl);
                         setWebViewClient(new WebViewClient() {
                             public void onPageFinished(WebView view, String url) {
-                            	executeJavascript("voiceoverMode()");
                                 executeJavascript("nativeQuoteFeed(parameters, cb)", null);
 
                                 if (callbackStart != null) {
