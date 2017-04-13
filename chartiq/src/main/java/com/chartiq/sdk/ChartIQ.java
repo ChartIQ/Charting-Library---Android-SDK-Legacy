@@ -123,6 +123,7 @@ public class ChartIQ extends WebView {
                         loadUrl(chartIQUrl);
                         setWebViewClient(new WebViewClient() {
                             public void onPageFinished(WebView view, String url) {
+                            	executeJavascript("voiceoverMode()");
                                 executeJavascript("nativeQuoteFeed(parameters, cb)", null);
 
                                 if (callbackStart != null) {
