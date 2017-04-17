@@ -4,6 +4,10 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.accessibility.AccessibilityManager;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
@@ -20,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class ChartIQ extends WebView {
     private static final String CHART_IQ_JS_OBJECT = "stxx";
@@ -48,18 +53,140 @@ public class ChartIQ extends WebView {
     private ArrayList<OnPullUpdateCallback> onPullUpdate = new ArrayList<>();
     private ArrayList<OnPullPaginationCallback> onPullPagination = new ArrayList<>();
     private ArrayList<Promise> promises = new ArrayList<>();
+    private HashMap<String, Boolean> talkbackFields = new HashMap<String, Boolean>();
+    
+    GestureDetector gd;
+    private AccessibilityManager mAccessibilityManager;
 
     public ChartIQ(Context context) {
         super(context);
+        mAccessibilityManager = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
+        gd = new GestureDetector(context, sogl);
     }
 
     public ChartIQ(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mAccessibilityManager = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
+        gd = new GestureDetector(context, sogl);
     }
 
     public ChartIQ(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mAccessibilityManager = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
+        gd = new GestureDetector(context, sogl);
     }
+    
+    private boolean swipeLeft = false;
+    private boolean swipeRight = false;
+    private static final int SWIPE_MIN_DISTANCE = 320;
+    private static final int SWIPE_MAX_OFF_PATH = 250;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // normal touch events if not in accessibility mode
+        if (mAccessibilityManager.isEnabled()
+                && !mAccessibilityManager.isTouchExplorationEnabled()) {
+            return super.onTouchEvent(event);
+        }
+
+        gd.onTouchEvent(event);
+        if (swipeLeft) {
+            swipeLeft = false;
+
+            executeJavascript("accessibilitySwipe();", new ValueCallback<String>() {
+                @Override
+                public void onReceiveValue(String value) {
+                    try{
+                        swipeGesture(value);
+                    } catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            return true;
+        } else if(swipeRight){
+            swipeRight = false;
+            executeJavascript("accessibilitySwipe(RIGHT_SWIPE);", new ValueCallback<String>() {
+                @Override
+                public void onReceiveValue(String value) {
+                    try{
+                        swipeGesture(value);
+                    } catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            return true;
+        } else {
+            return super.onTouchEvent(event);
+        }
+    }
+
+    public void swipeGesture(String value) {
+        String[] fieldsArray = value.split(Pattern.quote("||"));
+
+        if(fieldsArray.length == 6) {
+            // the below is very clunky, find a better way in the future
+            // maybe first idea of passing in fields to library instead
+            // of getting everything back
+            String date = fieldsArray[0];
+            String close = fieldsArray[1];
+            String open = fieldsArray[2];
+            String high = fieldsArray[3];
+            String low = fieldsArray[4];
+            String volume = fieldsArray[5];
+
+            String selectedFields = "";
+
+            if(talkbackFields.get(QuoteFields.DATE.value())) {
+                selectedFields += ", " + date;
+            }
+
+            if(talkbackFields.get(QuoteFields.CLOSE.value())) {
+                selectedFields += ", " + close;
+            }
+
+            if(talkbackFields.get(QuoteFields.OPEN.value())) {
+                selectedFields += ", " + open;
+            }
+
+            if(talkbackFields.get(QuoteFields.HIGH.value())) {
+                selectedFields += ", " + high;
+            }
+
+            if(talkbackFields.get(QuoteFields.LOW.value())) {
+                selectedFields += ", " + low;
+            }
+
+            if(talkbackFields.get(QuoteFields.VOLUME.value())) {
+                selectedFields += ", " + volume;
+            }
+
+            this.announceForAccessibility(selectedFields);
+        } else {
+            this.announceForAccessibility(value);
+        }
+    }
+
+    GestureDetector.SimpleOnGestureListener sogl = new GestureDetector.SimpleOnGestureListener() {
+        public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
+            float diffY = event1.getY() - event2.getY();
+            float diffX = event1.getX() - event2.getX();
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > 100 && Math.abs(velocityX) > 1) {
+                    if (diffX > 0) {
+                        swipeLeft = true;
+                    } else {
+                        swipeRight = true;
+                    }
+                }
+            }
+
+            return true;
+        }
+    };
 
     public static void setUser(String userName) {
         RokoMobi.setUser(userName);
@@ -200,6 +327,10 @@ public class ChartIQ extends WebView {
     }
 
     public void setSymbol(String symbol) {
+        if (mAccessibilityManager.isEnabled()
+               && mAccessibilityManager.isTouchExplorationEnabled()) {
+            executeJavascript("accessibilityMode()");
+        }
         executeJavascript("callNewChart(\"" + symbol + "\");", toastCallback);
         addEvent(new Event("CHIQ_setSymbol").set("symbol", symbol));
     }
@@ -650,6 +781,29 @@ public class ChartIQ extends WebView {
 
     public enum DataMethod {
         PUSH, PULL
+    }
+
+    public enum QuoteFields {
+        DATE("Date"),
+        CLOSE("Close"),
+        OPEN("Open"),
+        HIGH("High"),
+        LOW("Low"),
+        VOLUME("Volume");
+
+        private String quoteField;
+
+        QuoteFields(String quoteField) {
+            this.quoteField = quoteField;
+        }
+
+        public String value() {
+            return quoteField;
+        }
+    }
+
+    public void setTalkbackFields(HashMap<String, Boolean> talkbackFields) {
+        this.talkbackFields = talkbackFields;
     }
 
     public interface CallbackStart {

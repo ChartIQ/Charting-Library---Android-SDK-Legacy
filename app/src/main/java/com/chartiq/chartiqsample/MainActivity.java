@@ -53,6 +53,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 import static com.chartiq.chartiqsample.studies.StudiesActivity.ACTIVE_STUDIES;
@@ -94,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
     OHLCChart[] data;
     boolean chartLoaded = false;
 
+    HashMap<String, Boolean> talkbackFields = new HashMap<String, Boolean>();
+
     private final Item[] items = new Item[]{
         new Item("header", "Intervals", -1),
         new Item("divider", null, -1),
@@ -124,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
         doMappings();
+        createTalkbackFields();
 
         chartIQ.setRefreshInterval(REFRESH_INTERVAL);
         symbolInput.setText(defaultSymbol);
@@ -684,6 +688,18 @@ public class MainActivity extends AppCompatActivity {
         String pattern = String.valueOf(view.getTag());
         chartIQ.setDrawingParameter("\"pattern\"", "\"" + pattern.substring(0, pattern.length() - 1) + "\"");
         chartIQ.setDrawingParameter("\"lineWidth\"", pattern.substring(pattern.length() - 1));
+    }
+
+    // set field to true if talkback mode needs to announce the value
+    private void createTalkbackFields() {
+        talkbackFields.put(ChartIQ.QuoteFields.DATE.value(), true);
+        talkbackFields.put(ChartIQ.QuoteFields.CLOSE.value(), true);
+        talkbackFields.put(ChartIQ.QuoteFields.OPEN.value(), false);
+        talkbackFields.put(ChartIQ.QuoteFields.HIGH.value(), false);
+        talkbackFields.put(ChartIQ.QuoteFields.LOW.value(), false);
+        talkbackFields.put(ChartIQ.QuoteFields.VOLUME.value(), false);
+
+        chartIQ.setTalkbackFields(talkbackFields);
     }
 
     class Item {
