@@ -32,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.content.res.Configuration;
 
 import com.chartiq.sdk.ChartIQ;
 import com.chartiq.sdk.Promise;
@@ -120,6 +121,11 @@ public class MainActivity extends AppCompatActivity {
         new Item("divider", null, -1),
         new Item("item", "1 month", R.id.month1)
     };
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
