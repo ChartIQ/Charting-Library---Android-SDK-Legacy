@@ -193,17 +193,21 @@ public class ChartIQ extends WebView {
     }
 
     public static void setUser(String userName, final SetUserCallback callback) {
-        RokoMobi.setUser(userName, new ResponseCallback() {
-            @Override
-            public void success(Response response) {
-                callback.onSetUser(RokoMobi.getLoginUser());
-            }
+        if(userName.length() > 0) {
+            RokoMobi.setUser(userName, new ResponseCallback() {
+                @Override
+                public void success(Response response) {
+                    callback.onSetUser(RokoMobi.getLoginUser());
+                }
 
-            @Override
-            public void failure(Response response) {
+                @Override
+                public void failure(Response response) {
 
-            }
-        });
+                }
+            });
+        } else {
+            callback.onSetUser(null);
+        }
     }
 
     public static void setUserCustomProperty(String property, String value) {
@@ -236,31 +240,42 @@ public class ChartIQ extends WebView {
         }
     }
 
-    public void start(String apiToken, final String chartIQUrl, final CallbackStart callbackStart) {
-        RokoMobi.start(getContext(), apiToken, new RokoLogger.CallbackStart() {
+    private void runChartIQ(final String chartIQUrl, final CallbackStart callbackStart) {
+        ChartIQ.this.post(new Runnable() {
             @Override
-            public void load() {
-                ChartIQ.this.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        getSettings().setJavaScriptEnabled(true);
-                        getSettings().setDomStorageEnabled(true);
-                        addJavascriptInterface(ChartIQ.this, "promises");
-                        addJavascriptInterface(ChartIQ.this, "QuoteFeed");
-                        loadUrl(chartIQUrl);
-                        setWebViewClient(new WebViewClient() {
-                            public void onPageFinished(WebView view, String url) {
-                                executeJavascript("nativeQuoteFeed(parameters, cb)", null);
+            public void run() {
+                getSettings().setJavaScriptEnabled(true);
+                getSettings().setDomStorageEnabled(true);
+                addJavascriptInterface(ChartIQ.this, "promises");
+                addJavascriptInterface(ChartIQ.this, "QuoteFeed");
+                loadUrl(chartIQUrl);
+                setWebViewClient(new WebViewClient() {
+                    public void onPageFinished(WebView view, String url) {
+                        executeJavascript("nativeQuoteFeed(parameters, cb)", null);
 
-                                if (callbackStart != null) {
-                                    callbackStart.onStart();
-                                }
-                            }
-                        });
+                        if (callbackStart != null) {
+                            callbackStart.onStart();
+                        }
                     }
                 });
             }
         });
+    }
+
+    public void start(String apiToken, final String chartIQUrl, final CallbackStart callbackStart) {
+        if(apiToken.length() > 0) {
+            RokoMobi.start(getContext(), apiToken, new RokoLogger.CallbackStart() {
+                @Override
+                public void load() {
+                    disableAnalytics = false;
+                    runChartIQ(chartIQUrl, callbackStart);
+                }
+            });
+        } else {
+            disableAnalytics = true;
+            runChartIQ(chartIQUrl, callbackStart);
+        }
+
     }
 
     public ArrayList<OnLayoutChangedCallback> getOnLayoutChangedCallbacks() {
