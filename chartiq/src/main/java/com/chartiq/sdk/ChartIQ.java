@@ -54,7 +54,7 @@ public class ChartIQ extends WebView {
     private ArrayList<OnPullPaginationCallback> onPullPagination = new ArrayList<>();
     private ArrayList<Promise> promises = new ArrayList<>();
     private HashMap<String, Boolean> talkbackFields = new HashMap<String, Boolean>();
-    
+
     GestureDetector gd;
     private AccessibilityManager mAccessibilityManager;
 
@@ -75,13 +75,13 @@ public class ChartIQ extends WebView {
         mAccessibilityManager = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
         gd = new GestureDetector(context, sogl);
     }
-    
+
     private boolean swipeLeft = false;
     private boolean swipeRight = false;
     private static final int SWIPE_MIN_DISTANCE = 320;
     private static final int SWIPE_MAX_OFF_PATH = 250;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-    
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // normal touch events if not in accessibility mode
@@ -343,7 +343,7 @@ public class ChartIQ extends WebView {
 
     public void setSymbol(String symbol) {
         if (mAccessibilityManager.isEnabled()
-               && mAccessibilityManager.isTouchExplorationEnabled()) {
+                && mAccessibilityManager.isTouchExplorationEnabled()) {
             executeJavascript("accessibilityMode()");
         }
         executeJavascript("callNewChart(\"" + symbol + "\");", toastCallback);
@@ -726,12 +726,52 @@ public class ChartIQ extends WebView {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                String script = jsObject + "." + methodName + "(" + CHART_IQ_JS_OBJECT + ", " + buildArgumentStringFromArgs(args) + ")";
+                String script = CHART_IQ_JS_OBJECT + "." + methodName + "(" + buildArgumentStringFromArgs(args) + ")";
                 ValueCallback callback = getCallBackFromArgs(args);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     evaluateJavascript(script, callback);
                 } else {
-                    loadUrl(script);
+                    loadUrl("javascript:" + script);
+                }
+            }
+        };
+        runOnUiThread(runnable);
+    }
+
+    /**
+     * Change a css style on the chart
+     * @param args parameters that define what to change, must be put in order (selector, property, value)
+     *             ex: changeChartStyle("stx_mountain_chart", "color", "blue");
+     */
+    public void changeChartStyle(final Object... args) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                String script = CHART_IQ_JS_OBJECT + ".setStyle(" + buildArgumentStringFromArgs(args) + ")";
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    evaluateJavascript(script, null);
+                } else {
+                    loadUrl("javascript:" + script);
+                }
+            }
+        };
+        runOnUiThread(runnable);
+    }
+
+    /**
+     * Change a property value on the chart
+     * @param property The property to change
+     * @param value The value to change
+     */
+    public void changeChartProperty(final String property, final String value) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                String script = CHART_IQ_JS_OBJECT + ".chart." + property + "=" + buildArgumentStringFromArgs(value);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    evaluateJavascript(script, null);
+                } else {
+                    loadUrl("javascript:" + script);
                 }
             }
         };
