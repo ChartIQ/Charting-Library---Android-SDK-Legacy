@@ -85,7 +85,7 @@ public class ChartIQ extends WebView {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // normal touch events if not in accessibility mode
-        if (mAccessibilityManager.isEnabled()
+        if (!mAccessibilityManager.isEnabled()
                 && !mAccessibilityManager.isTouchExplorationEnabled()) {
             return super.onTouchEvent(event);
         }
