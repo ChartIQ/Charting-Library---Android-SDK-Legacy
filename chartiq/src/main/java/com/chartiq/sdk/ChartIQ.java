@@ -375,9 +375,10 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_pushInitialData").set("symbol", symbol).set("data", data));
     }
 
-    public void pushUpdate(String symbol, OHLCChart[] data) {
-        this.invoke("appendMasterData", symbol, data, toastCallback);
-        addEvent(new Event("CHIQ_pushUpdate").set("symbol", symbol).set("data", data));
+    public void pushUpdate(OHLCChart[] data) {
+        String json = new Gson().toJson(data);
+        executeJavascript("parseData('" + json + "');");
+        addEvent(new Event("CHIQ_pushUpdate").set("data", data));
     }
 
     public void setChartType(String chartType) {
