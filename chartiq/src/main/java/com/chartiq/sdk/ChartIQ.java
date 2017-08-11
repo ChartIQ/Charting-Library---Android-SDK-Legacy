@@ -465,6 +465,15 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_setStyle").set("style", parameter).set("value", value));
     }
 
+    /**
+     * Sets the theme for the chart: 'day', 'night', 'none'
+     * 'none' is there if the user wants to use custom themes they created
+     * @param theme
+     */
+    public void setTheme(String theme) {
+        executeJavascript("setTheme(\"" + theme + "\");", toastCallback);
+    }
+
     @JavascriptInterface
     public void setPromiseResult(int id, String result) {
         Promise p = promises.get(id);
