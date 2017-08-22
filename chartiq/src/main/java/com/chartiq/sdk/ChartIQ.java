@@ -382,12 +382,12 @@ public class ChartIQ extends WebView {
     }
 
     public void setChartType(String chartType) {
-        this.invoke("setChartType", chartType, toastCallback);
+        this.invoke("setChartType", chartType);
         addEvent(new Event("CHIQ_setChartType").set("chartType", chartType));
     }
 
     public void setAggregationType(String aggregationType) {
-        this.invoke("setAggregationType", aggregationType, toastCallback);
+        this.invoke("setAggregationType", aggregationType);
         addEvent(new Event("CHIQ_setAggregationType").set("aggregationType", aggregationType));
     }
 
@@ -409,20 +409,21 @@ public class ChartIQ extends WebView {
     }
 
     public void setChartScale(String scale) {
-        this.invoke("setChartScale", scale, toastCallback);
+        this.invoke("setChartScale", scale);
         addEvent(new Event("CHIQ_setChartScale").set("scale", scale));
     }
 
     public void addStudy(String studyName, Map<String, Object> inputs, Map<String, Object> outputs) {
-        this.invokeWithObject("CIQ.Studies", "addStudy", studyName, inputs, outputs, toastCallback);
+        String script = "addStudy(" + buildArgumentStringFromArgs(studyName, inputs, outputs) + ")";
+        executeJavascript(script, toastCallback);
         addEvent(new Event("CHIQ_addStudy").set("studyName", studyName));
     }
 
     public void addStudy(Study study) {
         if (study.type == null) {
-            this.invokeWithObject("CIQ.Studies", "addStudy", study.shortName, study.inputs, study.outputs, toastCallback);
+            addStudy(study.shortName, study.inputs, study.outputs);
         } else {
-            this.invokeWithObject("CIQ.Studies", "addStudy", study.type, study.inputs, study.outputs, toastCallback);
+            addStudy(study.type, study.inputs, study.outputs);
         }
         addEvent(new Event("CHIQ_addStudy").set("studyName", study.name));
     }
@@ -736,7 +737,7 @@ public class ChartIQ extends WebView {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                String script = CHART_IQ_JS_OBJECT + "." + methodName + "(" + buildArgumentStringFromArgs(args) + ")";
+                String script = jsObject + "." + methodName + "(" + buildArgumentStringFromArgs(args) + ")";
                 ValueCallback callback = getCallBackFromArgs(args);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     evaluateJavascript(script, callback);
