@@ -58,18 +58,33 @@ public class ChartIQ extends WebView {
     GestureDetector gd;
     private AccessibilityManager mAccessibilityManager;
 
+    /**
+     *
+     * @param context
+     */
     public ChartIQ(Context context) {
         super(context);
         mAccessibilityManager = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
         gd = new GestureDetector(context, sogl);
     }
 
+    /**
+     *
+     * @param context
+     * @param attrs
+     */
     public ChartIQ(Context context, AttributeSet attrs) {
         super(context, attrs);
         mAccessibilityManager = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
         gd = new GestureDetector(context, sogl);
     }
 
+    /**
+     *
+     * @param context
+     * @param attrs
+     * @param defStyleAttr
+     */
     public ChartIQ(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mAccessibilityManager = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
@@ -123,7 +138,11 @@ public class ChartIQ extends WebView {
         }
     }
 
-    public void swipeGesture(String value) {
+    /**
+     *
+     * @param value
+     */
+    private void swipeGesture(String value) {
         String[] fieldsArray = value.split(Pattern.quote("||"));
 
         if(fieldsArray.length == 6) {
@@ -188,10 +207,19 @@ public class ChartIQ extends WebView {
         }
     };
 
+    /**
+     *
+     * @param userName
+     */
     public static void setUser(String userName) {
         RokoMobi.setUser(userName);
     }
 
+    /**
+     *
+     * @param userName
+     * @param callback
+     */
     public static void setUser(String userName, final SetUserCallback callback) {
         if(userName.length() > 0) {
             RokoMobi.setUser(userName, new ResponseCallback() {
@@ -210,10 +238,21 @@ public class ChartIQ extends WebView {
         }
     }
 
+    /**
+     *
+     * @param property
+     * @param value
+     */
     public static void setUserCustomProperty(String property, String value) {
         RokoMobi.setUserCustomProperty(property, value);
     }
 
+    /**
+     *
+     * @param property
+     * @param value
+     * @param callback
+     */
     public static void setUserCustomProperty(String property, String value, final SetCustomPropertyCallback callback) {
         RokoMobi.setUserCustomProperty(property, value, new ResponseCallback() {
 
@@ -230,10 +269,18 @@ public class ChartIQ extends WebView {
         });
     }
 
+    /**
+     *
+     * @param properties
+     */
     public static void setUserCustomProperties(Map<String, String> properties) {
         RokoMobi.setUserCustomProperties(properties, null);
     }
 
+    /**
+     *
+     * @param event
+     */
     public void addEvent(Event event) {
         if (!disableAnalytics) {
             RokoLogger.addEvent(event);
@@ -262,6 +309,12 @@ public class ChartIQ extends WebView {
         });
     }
 
+    /**
+     *
+     * @param apiToken
+     * @param chartIQUrl
+     * @param callbackStart
+     */
     public void start(String apiToken, final String chartIQUrl, final CallbackStart callbackStart) {
         if(apiToken.length() > 0) {
             RokoMobi.start(getContext(), apiToken, new RokoLogger.CallbackStart() {
@@ -278,26 +331,50 @@ public class ChartIQ extends WebView {
 
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<OnLayoutChangedCallback> getOnLayoutChangedCallbacks() {
         return onLayoutChanged;
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<OnDrawingChangedCallback> getOnDrawingChangedCallbacks() {
         return onDrawingChanged;
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<OnPullInitialDataCallback> getOnPullInitialDataCallbacks() {
         return onPullInitialData;
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<OnPullUpdateCallback> getOnPullUpdateCallbacks() {
         return onPullUpdate;
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<OnPullPaginationCallback> getOnPullPaginationCallbacks() {
         return onPullPagination;
     }
 
+    /**
+     *
+     * @param dataSource
+     */
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -312,6 +389,11 @@ public class ChartIQ extends WebView {
         void execute(OHLCChart[] data);
     }
 
+    /**
+     *
+     * @param method
+     * @param symbol
+     */
     public void setDataMethod(DataMethod method, String symbol) {
         DataMethod dataMethod;
         if(method == null) {
@@ -330,6 +412,10 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_setDataMethod").set("method", dataMethod == DataMethod.PULL ? "PULL" : "PUSH"));
     }
 
+    /**
+     *
+     * @return
+     */
     public Promise<String> getChartName() {
         final Promise<String> promise = new Promise<>();
         executeJavascript("getSymbol()", new ValueCallback<String>() {
@@ -341,6 +427,10 @@ public class ChartIQ extends WebView {
         return promise;
     }
 
+    /**
+     *
+     * @param symbol
+     */
     public void setSymbol(String symbol) {
         if (mAccessibilityManager.isEnabled()
                 && mAccessibilityManager.isTouchExplorationEnabled()) {
@@ -350,6 +440,10 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_setSymbol").set("symbol", symbol));
     }
 
+    /**
+     *
+     * @param symbolObject
+     */
     public void setSymbolObject(JSONObject symbolObject) {
         this.invoke("newChart", symbolObject, toastCallback);
         String symbol = "";
@@ -361,6 +455,12 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_setSymbol").set("symbolObject.symbol", symbol));
     }
 
+    /**
+     *
+     * @param period
+     * @param interval
+     * @param timeUnit
+     */
     public void setPeriodicity(int period, String interval, String timeUnit) {
         if (timeUnit == null) {
             timeUnit = "minute";
@@ -370,22 +470,39 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_setPeriodicity").set("periodicity", period).set("interval", interval));
     }
 
+    /**
+     *
+     * @param symbol
+     * @param data
+     */
     public void pushData(String symbol, OHLCChart[] data) {
         this.invoke("newChart", symbol, data, toastCallback);
         addEvent(new Event("CHIQ_pushInitialData").set("symbol", symbol).set("data", data));
     }
 
+    /**
+     *
+     * @param data
+     */
     public void pushUpdate(OHLCChart[] data) {
         String json = new Gson().toJson(data);
         executeJavascript("parseData('" + json + "');");
         addEvent(new Event("CHIQ_pushUpdate").set("data", data));
     }
 
+    /**
+     *
+     * @param chartType
+     */
     public void setChartType(String chartType) {
         this.invoke("setChartType", chartType);
         addEvent(new Event("CHIQ_setChartType").set("chartType", chartType));
     }
 
+    /**
+     *
+     * @param aggregationType
+     */
     public void setAggregationType(String aggregationType) {
         this.invoke("setAggregationType", aggregationType);
         addEvent(new Event("CHIQ_setAggregationType").set("aggregationType", aggregationType));
@@ -403,22 +520,39 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_removeComparison").set("symbol", symbol));
     }
 
+    /**
+     *
+     */
     public void clearChart() {
         this.invoke("destroy", toastCallback);
         addEvent(new Event("CHIQ_clearChart"));
     }
 
+    /**
+     *
+     * @param scale
+     */
     public void setChartScale(String scale) {
         this.invoke("setChartScale", scale);
         addEvent(new Event("CHIQ_setChartScale").set("scale", scale));
     }
 
+    /**
+     *
+     * @param studyName
+     * @param inputs
+     * @param outputs
+     */
     public void addStudy(String studyName, Map<String, Object> inputs, Map<String, Object> outputs) {
         String script = "addStudy(" + buildArgumentStringFromArgs(studyName, inputs, outputs) + ")";
         executeJavascript(script, toastCallback);
         addEvent(new Event("CHIQ_addStudy").set("studyName", studyName));
     }
 
+    /**
+     *
+     * @param study
+     */
     public void addStudy(Study study) {
         if (study.type == null) {
             addStudy(study.shortName, study.inputs, study.outputs);
@@ -428,21 +562,35 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_addStudy").set("studyName", study.name));
     }
 
+    /**
+     *
+     * @param studyName
+     */
     public void removeStudy(String studyName) {
         executeJavascript("removeStudy(\"" + studyName + "\");", toastCallback);
         addEvent(new Event("CHIQ_removeStudy"));
     }
 
+    /**
+     *
+     */
     public void enableCrosshairs() {
         executeJavascript("enableCrosshairs(true);", toastCallback);
         addEvent(new Event("CHIQ_enableCrosshairs"));
     }
 
+    /**
+     *
+     */
     public void disableCrosshairs() {
         executeJavascript("enableCrosshairs(false);", toastCallback);
         addEvent(new Event("CHIQ_disableCrosshairs"));
     }
 
+    /**
+     *
+     * @param type
+     */
     public void enableDrawing(String type) {
         invoke("changeVectorType", type, toastCallback);
         addEvent(new Event("CHIQ_enableDrawing"));
@@ -461,6 +609,12 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_setDrawingParameter").set("parameter", parameter).set("value", value));
     }
 
+    /**
+     *
+     * @param object
+     * @param parameter
+     * @param value
+     */
     public void setStyle(String object, String parameter, String value) {
         this.invoke("setStyle", object, parameter, value, toastCallback);
         addEvent(new Event("CHIQ_setStyle").set("style", parameter).set("value", value));
@@ -475,6 +629,11 @@ public class ChartIQ extends WebView {
         executeJavascript("setTheme(\"" + theme + "\");", toastCallback);
     }
 
+    /**
+     *
+     * @param id
+     * @param result
+     */
     @JavascriptInterface
     public void setPromiseResult(int id, String result) {
         Promise p = promises.get(id);
@@ -486,6 +645,10 @@ public class ChartIQ extends WebView {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public Promise<Study[]> getStudyList() {
         String script = "getStudyList();";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -509,6 +672,10 @@ public class ChartIQ extends WebView {
 
     }
 
+    /**
+     *
+     * @return
+     */
     public Promise<Study[]> getActiveStudies() {
         executeJavascript("determineOs();");
         String script = "getActiveStudies();";
@@ -533,6 +700,11 @@ public class ChartIQ extends WebView {
         }
     }
 
+    /**
+     *
+     * @param studyName
+     * @return
+     */
     public Promise<String> getStudyInputParameters(String studyName) {
         String script = "getStudyParameters(\"" + studyName + "\" , true);";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -555,6 +727,11 @@ public class ChartIQ extends WebView {
         }
     }
 
+    /**
+     *
+     * @param studyName
+     * @return
+     */
     public Promise<String> getStudyOutputParameters(String studyName) {
         String script = "getStudyParameters(\"" + studyName + "\" , false);";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -577,6 +754,12 @@ public class ChartIQ extends WebView {
         }
     }
 
+    /**
+     *
+     * @param studyName
+     * @param parameter
+     * @param value
+     */
     public void setStudyInputParameter(String studyName, String parameter, String value) {
         String args = buildArgumentStringFromArgs(studyName, parameter, value);
         String script = "setStudyParameter(" + args + ", true);";
@@ -584,6 +767,12 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_setStudyParameter").set("parameter", parameter).set("value", value));
     }
 
+    /**
+     *
+     * @param studyName
+     * @param parameter
+     * @param value
+     */
     public void setStudyOutputParameter(String studyName, String parameter, String value) {
         String args = buildArgumentStringFromArgs(studyName, parameter, value);
         String script = "setStudyParameter(" + args + ", false);";
@@ -591,6 +780,11 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_setStudyParameter").set("parameter", parameter).set("value", value));
     }
 
+    /**
+     *
+     * @param drawingName
+     * @return
+     */
     public Promise<String> getDrawingParameters(String drawingName) {
         String script = "getCurrentVectorParameters();";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -612,6 +806,10 @@ public class ChartIQ extends WebView {
         }
     }
 
+    /**
+     *
+     * @param json
+     */
     @JavascriptInterface
     public void layoutChange(JSONObject json) {
         for (OnLayoutChangedCallback callback : onLayoutChanged) {
@@ -620,6 +818,10 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_layoutChange").set("json", String.valueOf(json)));
     }
 
+    /**
+     *
+     * @param json
+     */
     @JavascriptInterface
     public void drawingChange(JSONObject json) {
         for (OnDrawingChangedCallback callback : onDrawingChanged) {
@@ -628,6 +830,16 @@ public class ChartIQ extends WebView {
         addEvent(new Event("CHIQ_drawingChange").set("json", String.valueOf(json)));
     }
 
+    /**
+     *
+     * @param symbol
+     * @param period
+     * @param interval
+     * @param start
+     * @param end
+     * @param meta
+     * @param id
+     */
     @JavascriptInterface
     public void pullInitialData(final String symbol, int period, String interval, String start, String end, Object meta, final String id) {
         Map<String, Object> params = new HashMap<>();
@@ -657,6 +869,15 @@ public class ChartIQ extends WebView {
         );
     }
 
+    /**
+     *
+     * @param symbol
+     * @param period
+     * @param interval
+     * @param start
+     * @param meta
+     * @param callbackId
+     */
     @JavascriptInterface
     public void pullUpdate(final String symbol, int period, String interval, String start, Object meta, final String callbackId) {
         Map<String, Object> params = new HashMap<>();
@@ -684,6 +905,16 @@ public class ChartIQ extends WebView {
         );
     }
 
+    /**
+     *
+     * @param symbol
+     * @param period
+     * @param interval
+     * @param start
+     * @param end
+     * @param meta
+     * @param callbackId
+     */
     @JavascriptInterface
     public void pullPagination(final String symbol, int period, String interval, String start, String end, Object meta, final String callbackId) {
         Map<String, Object> params = new HashMap<>();
@@ -717,7 +948,12 @@ public class ChartIQ extends WebView {
         executeJavascript("parseData('" + json + "', \"" + callbackId + "\");");
     }
 
-    private void invoke(final String methodName, final Object... args) {
+    /**
+     * Execute function from chart engine object
+     * @param methodName javascript function to execute
+     * @param args arguments to pass to javascript function
+     */
+    public void invoke(final String methodName, final Object... args) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -733,6 +969,12 @@ public class ChartIQ extends WebView {
         runOnUiThread(runnable);
     }
 
+    /**
+     * Execute function from specified object
+     * @param jsObject object to execute function from
+     * @param methodName javascript function to execute
+     * @param args arguments to pass to javascript function
+     */
     private void invokeWithObject(final String jsObject, final String methodName, final Object... args) {
         Runnable runnable = new Runnable() {
             @Override
