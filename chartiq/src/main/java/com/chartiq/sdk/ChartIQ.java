@@ -407,7 +407,7 @@ public class ChartIQ extends WebView {
         if (dataMethod == DataMethod.PULL) {
             executeJavascript("attachQuoteFeed(" + getRefreshInterval() + ")", null);
         } else {
-            this.invoke("newChart", symbol, toastCallback);
+            this.invoke("newChart", toastCallback, symbol);
         }
         addEvent(new Event("CHIQ_setDataMethod").set("method", dataMethod == DataMethod.PULL ? "PULL" : "PUSH"));
     }
@@ -436,7 +436,9 @@ public class ChartIQ extends WebView {
                 && mAccessibilityManager.isTouchExplorationEnabled()) {
             executeJavascript("accessibilityMode()");
         }
-        executeJavascript("callNewChart(\"" + symbol + "\");", toastCallback);
+        this.invoke("newChart", toastCallback, symbol);
+        this.invoke("dateFromTick", toastCallback, 1);
+        //executeJavascript("callNewChart(\"" + symbol + "\");", toastCallback);
         addEvent(new Event("CHIQ_setSymbol").set("symbol", symbol));
     }
 
@@ -445,7 +447,7 @@ public class ChartIQ extends WebView {
      * @param symbolObject
      */
     public void setSymbolObject(JSONObject symbolObject) {
-        this.invoke("newChart", symbolObject, toastCallback);
+        this.invoke("newChart", toastCallback, symbolObject);
         String symbol = "";
         try {
             symbol = symbolObject.getString("symbol");
@@ -476,7 +478,7 @@ public class ChartIQ extends WebView {
      * @param data
      */
     public void pushData(String symbol, OHLCChart[] data) {
-        this.invoke("newChart", symbol, data, toastCallback);
+        this.invoke("newChart", toastCallback, symbol, data);
         addEvent(new Event("CHIQ_pushInitialData").set("symbol", symbol).set("data", data));
     }
 
@@ -495,7 +497,7 @@ public class ChartIQ extends WebView {
      * @param chartType
      */
     public void setChartType(String chartType) {
-        this.invoke("setChartType", chartType);
+        this.invoke("setChartType", toastCallback, chartType);
         addEvent(new Event("CHIQ_setChartType").set("chartType", chartType));
     }
 
@@ -504,7 +506,7 @@ public class ChartIQ extends WebView {
      * @param aggregationType
      */
     public void setAggregationType(String aggregationType) {
-        this.invoke("setAggregationType", aggregationType);
+        this.invoke("setAggregationType", toastCallback, aggregationType);
         addEvent(new Event("CHIQ_setAggregationType").set("aggregationType", aggregationType));
     }
 
@@ -516,7 +518,7 @@ public class ChartIQ extends WebView {
     }
 
     public void removeComparison(String symbol) {
-        this.invoke("removeSeries", symbol, toastCallback);
+        this.invoke("removeSeries", toastCallback, symbol);
         addEvent(new Event("CHIQ_removeComparison").set("symbol", symbol));
     }
 
@@ -533,7 +535,7 @@ public class ChartIQ extends WebView {
      * @param scale
      */
     public void setChartScale(String scale) {
-        this.invoke("setChartScale", scale);
+        this.invoke("setChartScale", toastCallback, scale);
         addEvent(new Event("CHIQ_setChartScale").set("scale", scale));
     }
 
@@ -592,7 +594,7 @@ public class ChartIQ extends WebView {
      * @param type
      */
     public void enableDrawing(String type) {
-        invoke("changeVectorType", type, toastCallback);
+        invoke("changeVectorType", toastCallback, type);
         addEvent(new Event("CHIQ_enableDrawing"));
     }
 
@@ -616,7 +618,7 @@ public class ChartIQ extends WebView {
      * @param value
      */
     public void setStyle(String object, String parameter, String value) {
-        this.invoke("setStyle", object, parameter, value, toastCallback);
+        this.invoke("setStyle", toastCallback, object, parameter, value);
         addEvent(new Event("CHIQ_setStyle").set("style", parameter).set("value", value));
     }
 
@@ -950,15 +952,16 @@ public class ChartIQ extends WebView {
 
     /**
      * Execute function from chart engine object
-     * @param methodName javascript function to execute
+     * @param functionName javascript function to execute
+     * @param callback java method to call when functionName is finished executing
      * @param args arguments to pass to javascript function
      */
-    public void invoke(final String methodName, final Object... args) {
+    public void invoke(final String functionName, final ValueCallback callback,  final Object... args) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                String script = CHART_IQ_JS_OBJECT + "." + methodName + "(" + buildArgumentStringFromArgs(args) + ")";
-                ValueCallback callback = getCallBackFromArgs(args);
+                String script = CHART_IQ_JS_OBJECT + "." + functionName + "(" + buildArgumentStringFromArgs(args) + ")";
+                //ValueCallback callback = getCallBackFromArgs(args);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     evaluateJavascript(script, callback);
                 } else {
