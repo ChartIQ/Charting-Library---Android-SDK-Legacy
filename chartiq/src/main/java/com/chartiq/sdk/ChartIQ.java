@@ -437,10 +437,10 @@ public class ChartIQ extends WebView {
 		if (mAccessibilityManager.isEnabled() && mAccessibilityManager.isTouchExplorationEnabled()) {
 			executeJavascript("accessibilityMode()");
 		}
-		this.invoke("newChart", toastCallback, symbol);
+		//this.invoke("newChart", toastCallback, symbol);
 		this.invoke("dateFromTick", toastCallback, 1);
-		// executeJavascript("callNewChart(\"" + symbol + "\");",
-		// toastCallback);
+		executeJavascript("callNewChart(\"" + symbol + "\");",
+		toastCallback);
 		addEvent(new Event("CHIQ_setSymbol").set("symbol", symbol));
 	}
 
