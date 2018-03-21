@@ -210,7 +210,7 @@ public class StudiesActivity extends AppCompatActivity {
         selectiontoolbar.setVisibility(View.GONE);
     }
 
-    private void configureStudiesList(final RecyclerView studiesList, List<Study> activeStudiesList, List<Study> availableStudies) {
+    private void configureStudiesList(final RecyclerView studiesList, final List<Study> activeStudiesList, List<Study> availableStudies) {
         studiesAdapter = new StudiesAdapter(this, activeStudiesList, availableStudies, new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -218,7 +218,15 @@ public class StudiesActivity extends AppCompatActivity {
                 chartIQ.getActiveStudies().than(new Promise.Callback<Study[]>() {
                     @Override
                     public void call(Study[] array) {
-                        if (array != null && array.length > 0) {
+                        if(array.length <= 0){
+                            array=new Study[activeStudiesList.size()];
+                            int i=0;
+                            for(Study x : activeStudiesList){
+                                array[i]=x;
+                                i++;
+                            }
+                        }
+                        //if (array != null && array.length > 0) {
                             ArrayList<Study> active = new ArrayList<>(Arrays.asList(array));
                             for (final Study s : active) {
                                 if (s.shortName.equals(clickedStudy.shortName) || s.type.equals(clickedStudy.shortName) || s.type.equals(clickedStudy.type)) {
@@ -241,7 +249,7 @@ public class StudiesActivity extends AppCompatActivity {
                                     });
                                 }
                             }
-                        }
+                        //}
                     }
                 });
             }
