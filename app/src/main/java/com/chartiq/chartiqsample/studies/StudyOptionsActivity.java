@@ -71,23 +71,35 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
         if (getIntent().hasExtra("inputs")) {
             try {
-                inputs = new Gson().fromJson(getIntent().getStringExtra("inputs"), StudyParameter[].class);
+                String x = getIntent().getStringExtra("inputs");
+                x=x.replace("\"[","[");
+                x=x.replace("]\"","]");
+                x=x.replace("\\\"","\"");
+                inputs = new Gson().fromJson(x, StudyParameter[].class);
             } catch(Exception exception){
-                System.out.println("here "+exception);
                 exception.printStackTrace();
 
             }
-
             if (study.inputs != null) {
                 bindStudyOptions(inputs, study.inputs);
             }
         }
 
         if (getIntent().hasExtra("outputs")) {
-//            outputs = new Gson().fromJson(getIntent().getStringExtra("outputs"), StudyParameter[].class);
-//            if (study.outputs != null) {
-//                bindStudyOptions(outputs, study.outputs);
-//            }
+            try {
+
+                String x = getIntent().getStringExtra("outputs");
+                x = x.replace("\"[", "[");
+                x = x.replace("]\"", "]");
+                x = x.replace("\\\"", "\"");
+                outputs = new Gson().fromJson(x, StudyParameter[].class);
+            } catch(Exception exception){
+                exception.printStackTrace();
+
+            }
+            if (study.outputs != null) {
+                bindStudyOptions(outputs, study.outputs);
+            }
         }
 
         colorPalette = new PopupWindow(this);
