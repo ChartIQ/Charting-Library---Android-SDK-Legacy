@@ -71,11 +71,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
         if (getIntent().hasExtra("inputs")) {
             try {
-                String x = getIntent().getStringExtra("inputs");
-                x=x.replace("\"[","[");
-                x=x.replace("]\"","]");
-                x=x.replace("\\\"","\"");
-                inputs = new Gson().fromJson(x, StudyParameter[].class);
+                inputs = new Gson().fromJson(getIntent().getStringExtra("inputs"), StudyParameter[].class);
             } catch(Exception exception){
                 exception.printStackTrace();
 
@@ -87,12 +83,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
         if (getIntent().hasExtra("outputs")) {
             try {
-
-                String x = getIntent().getStringExtra("outputs");
-                x = x.replace("\"[", "[");
-                x = x.replace("]\"", "]");
-                x = x.replace("\\\"", "\"");
-                outputs = new Gson().fromJson(x, StudyParameter[].class);
+                outputs = new Gson().fromJson(getIntent().getStringExtra("outputs"), StudyParameter[].class);
             } catch(Exception exception){
                 exception.printStackTrace();
 
