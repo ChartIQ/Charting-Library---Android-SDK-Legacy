@@ -4,8 +4,8 @@ import java.util.UUID;
 
 class Settings {
 
-    public String chartiqSdkVersion = "1.0.13";
-    public String applicationVersion = "1.0.13";
+    public String chartiqSdkVersion = "1.0.14";
+    public String applicationVersion = "1.0.14";
     String authSession = null; // Only for autorized user. If user logout set null
     String deviceModel;
     String operatingSystem;
