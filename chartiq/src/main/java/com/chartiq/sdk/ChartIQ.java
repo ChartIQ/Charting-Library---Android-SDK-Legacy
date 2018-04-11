@@ -711,6 +711,7 @@ public class ChartIQ extends WebView {
 	 * @return
 	 */
 	public Promise<String> getStudyInputParameters(String studyName) {
+		executeJavascript("determineOs();");
 		String script = "getStudyParameters(\"" + studyName + "\" , true);";
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			final Promise<String> promise = new Promise<>();
@@ -738,6 +739,7 @@ public class ChartIQ extends WebView {
 	 * @return
 	 */
 	public Promise<String> getStudyOutputParameters(String studyName) {
+		executeJavascript("determineOs();");
 		String script = "getStudyParameters(\"" + studyName + "\" , false);";
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			final Promise<String> promise = new Promise<>();

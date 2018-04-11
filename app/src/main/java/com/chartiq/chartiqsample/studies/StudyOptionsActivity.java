@@ -70,15 +70,24 @@ public class StudyOptionsActivity extends AppCompatActivity {
         }
 
         if (getIntent().hasExtra("inputs")) {
-            System.out.println(getIntent().getStringExtra("inputs").getClass());
-            inputs = new Gson().fromJson(getIntent().getStringExtra("inputs"), StudyParameter[].class);
+            try {
+                inputs = new Gson().fromJson(getIntent().getStringExtra("inputs"), StudyParameter[].class);
+            } catch(Exception exception){
+                exception.printStackTrace();
+
+            }
             if (study.inputs != null) {
                 bindStudyOptions(inputs, study.inputs);
             }
         }
 
         if (getIntent().hasExtra("outputs")) {
-            outputs = new Gson().fromJson(getIntent().getStringExtra("outputs"), StudyParameter[].class);
+            try {
+                outputs = new Gson().fromJson(getIntent().getStringExtra("outputs"), StudyParameter[].class);
+            } catch(Exception exception){
+                exception.printStackTrace();
+
+            }
             if (study.outputs != null) {
                 bindStudyOptions(outputs, study.outputs);
             }

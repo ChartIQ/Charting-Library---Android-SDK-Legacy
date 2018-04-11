@@ -42,11 +42,6 @@
             android:parentActivityName="com.chartiq.chartiqsample.studies.StudiesActivity"
             android:windowSoftInputMode="stateHidden|adjustResize">
         </activity>
-        <activity
-            android:name="com.chartiq.chartiqsample.studies.StudySelectOptionActivity"
-            android:label="Choose Value"
-            android:parentActivityName="com.chartiq.chartiqsample.studies.StudyOptionsActivity">
-        </activity>
     </application>
 
 </manifest>
