@@ -241,8 +241,6 @@ public class StudiesActivity extends AppCompatActivity {
                                         }
                                     });
                                 }
-
-
                             });
                         }
                     }
