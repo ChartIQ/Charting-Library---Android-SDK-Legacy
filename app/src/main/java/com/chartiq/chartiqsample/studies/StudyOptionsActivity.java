@@ -43,6 +43,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
     private String colorOptionName;
     private StudyParameter[] inputs;
     private StudyParameter[] outputs;
+    private StudyParameter[] parameters;
     private TextView selectView;
 
     @Override
@@ -93,6 +94,17 @@ public class StudyOptionsActivity extends AppCompatActivity {
             }
         }
 
+        if (getIntent().hasExtra("parameters")) {
+            try {
+                parameters = new Gson().fromJson(getIntent().getStringExtra("parameters"), StudyParameter[].class);
+            } catch(Exception exception){
+                exception.printStackTrace();
+            }
+            if(study.parameters != null){
+                bindStudyOptions(parameters, study.parameters);
+            }
+        }
+
         colorPalette = new PopupWindow(this);
         colorPalette.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
         colorPalette.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
@@ -136,7 +148,9 @@ public class StudyOptionsActivity extends AppCompatActivity {
                     parameter.color = String.valueOf(studyParams.get(parameter.name));
                 }
                 bindColor(parameter);
-            } else if (parameter.type != null) {
+            }
+
+            if (parameter.type != null) {
                 switch (parameter.type) {
                     case "select":
                         if (studyParams.containsKey(parameter.name) && !"field".equals(studyParams.get(parameter.name))) {

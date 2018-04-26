@@ -226,12 +226,18 @@ public class StudiesActivity extends AppCompatActivity {
                                 public void call(final String outputs) {
                                     chartIQ.getStudyInputParameters(name).than(new Promise.Callback<String>() {
                                         @Override
-                                        public void call(String inputs) {
-                                            Intent studyOptionsIntent = new Intent(StudiesActivity.this, StudyOptionsActivity.class);
-                                            studyOptionsIntent.putExtra("study", clickedStudy);
-                                            studyOptionsIntent.putExtra("outputs", outputs);
-                                            studyOptionsIntent.putExtra("inputs", inputs);
-                                            startActivityForResult(studyOptionsIntent, 0);
+                                        public void call(final String inputs) {
+                                            chartIQ.getStudyParameters(name).than(new Promise.Callback<String>() {
+                                                @Override
+                                                public void call(final String parameters) {
+                                                    Intent studyOptionsIntent = new Intent(StudiesActivity.this, StudyOptionsActivity.class);
+                                                    studyOptionsIntent.putExtra("study", clickedStudy);
+                                                    studyOptionsIntent.putExtra("outputs", outputs);
+                                                    studyOptionsIntent.putExtra("inputs", inputs);
+                                                    studyOptionsIntent.putExtra("parameters", parameters);
+                                                    startActivityForResult(studyOptionsIntent, 0);
+                                                }
+                                            });
                                         }
                                     });
                                 }

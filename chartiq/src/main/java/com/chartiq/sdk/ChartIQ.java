@@ -712,7 +712,7 @@ public class ChartIQ extends WebView {
 	 */
 	public Promise<String> getStudyInputParameters(String studyName) {
 		executeJavascript("determineOs();");
-		String script = "getStudyParameters(\"" + studyName + "\" , true);";
+		String script = "getStudyParameters(\"" + studyName + "\" , \"inputs\");";
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			final Promise<String> promise = new Promise<>();
 			executeJavascript(script, new ValueCallback<String>() {
@@ -740,7 +740,7 @@ public class ChartIQ extends WebView {
 	 */
 	public Promise<String> getStudyOutputParameters(String studyName) {
 		executeJavascript("determineOs();");
-		String script = "getStudyParameters(\"" + studyName + "\" , false);";
+		String script = "getStudyParameters(\"" + studyName + "\" , \"outputs\");";
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			final Promise<String> promise = new Promise<>();
 			executeJavascript(script, new ValueCallback<String>() {
@@ -756,6 +756,34 @@ public class ChartIQ extends WebView {
 			promises.add(promise);
 			loadUrl("javascript:" + script);
 			loadUrl("javascript:promises.setPromiseResult(" + promises.indexOf(promise) + ", helper.outputs)");
+			addEvent(new Event("CHIQ_getStudyParameters").set("studyName", studyName));
+			return promise;
+		}
+	}
+
+	/**
+	 *
+	 * @param studyName
+	 * @return
+	 */
+	public Promise<String> getStudyParameters(String studyName) {
+		executeJavascript("determineOs();");
+		String script = "getStudyParameters(\"" + studyName + "\" , \"parameters\");";
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			final Promise<String> promise = new Promise<>();
+			executeJavascript(script, new ValueCallback<String>() {
+				@Override
+				public void onReceiveValue(String value) {
+					promise.setResult(value);
+				}
+			});
+			addEvent(new Event("CHIQ_getStudyParameters").set("studyName", studyName));
+			return promise;
+		} else {
+			final Promise<String> promise = new Promise<>();
+			promises.add(promise);
+			loadUrl("javascript:" + script);
+			loadUrl("javascript:promises.setPromiseResult(" + promises.indexOf(promise) + ", helper.parameters");
 			addEvent(new Event("CHIQ_getStudyParameters").set("studyName", studyName));
 			return promise;
 		}
