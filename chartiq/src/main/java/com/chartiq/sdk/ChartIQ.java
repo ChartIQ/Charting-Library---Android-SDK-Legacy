@@ -1,5 +1,6 @@
 package com.chartiq.sdk;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Looper;
@@ -217,6 +218,7 @@ public class ChartIQ extends WebView {
 
 	}
 
+	@SuppressLint("setJavaScriptEnabled")
 	private void runChartIQ(final String chartIQUrl, final CallbackStart callbackStart) {
 		ChartIQ.this.post(new Runnable() {
 			@Override
