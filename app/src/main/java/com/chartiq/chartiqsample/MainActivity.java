@@ -67,8 +67,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int REFRESH_INTERVAL = 1;
     private static final String defaultSymbol = "AAPL";
     public static final String chartUrl ="http://yourdeployment/sample-template-native-sdk.html";
-    public static final String rokoApiKey = "";
-    public static final String rokoUserName = "";
     ChartIQ chartIQ;
 
     //top toolbar
