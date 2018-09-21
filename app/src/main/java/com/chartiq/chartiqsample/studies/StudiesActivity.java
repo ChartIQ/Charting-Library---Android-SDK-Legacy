@@ -63,7 +63,6 @@ public class StudiesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         studiesList = (RecyclerView) findViewById(R.id.studies_list);
         chartIQ = (ChartIQ) findViewById(R.id.chart);
-        chartIQ.disableAnalytics = true;
         chartIQ.getSettings().setJavaScriptEnabled(true);
         chartIQ.getSettings().setDomStorageEnabled(true);
         chartIQ.addJavascriptInterface(chartIQ, "promises");

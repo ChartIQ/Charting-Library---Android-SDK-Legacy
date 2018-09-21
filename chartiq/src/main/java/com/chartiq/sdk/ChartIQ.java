@@ -1,5 +1,6 @@
 package com.chartiq.sdk;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Looper;
@@ -27,9 +28,10 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ChartIQ extends WebView {
+    public String chartiqSdkVersion = "2.0.0";
+    public String applicationVersion = "2.0.0";
 	private static final String CHART_IQ_JS_OBJECT = "stxx";
 	public int refreshInterval = 0;
-	public boolean disableAnalytics = false;
 	private boolean showDebugInfo;
 	private DataSource dataSource;
 	private ValueCallback EMPTY_CALLBACK = new ValueCallback() {
@@ -207,86 +209,16 @@ public class ChartIQ extends WebView {
 		}
 	};
 
-	/**
-	 *
-	 * @param userName
-	 */
-	public static void setUser(String userName) {
-		RokoMobi.setUser(userName);
-	}
-
-	/**
-	 *
-	 * @param userName
-	 * @param callback
-	 */
-	public static void setUser(String userName, final SetUserCallback callback) {
-		if (userName.length() > 0) {
-			RokoMobi.setUser(userName, new ResponseCallback() {
-				@Override
-				public void success(Response response) {
-					callback.onSetUser(RokoMobi.getLoginUser());
-				}
-
-				@Override
-				public void failure(Response response) {
-
-				}
-			});
-		} else {
-			callback.onSetUser(null);
-		}
-	}
-
-	/**
-	 *
-	 * @param property
-	 * @param value
-	 */
-	public static void setUserCustomProperty(String property, String value) {
-		RokoMobi.setUserCustomProperty(property, value);
-	}
-
-	/**
-	 *
-	 * @param property
-	 * @param value
-	 * @param callback
-	 */
-	public static void setUserCustomProperty(String property, String value, final SetCustomPropertyCallback callback) {
-		RokoMobi.setUserCustomProperty(property, value, new ResponseCallback() {
-
-			@Override
-			public void success(Response response) {
-				if (callback != null)
-					callback.onSetCustomProperty();
-			}
-
-			@Override
-			public void failure(Response response) {
-
-			}
-		});
-	}
-
-	/**
-	 *
-	 * @param properties
-	 */
-	public static void setUserCustomProperties(Map<String, String> properties) {
-		RokoMobi.setUserCustomProperties(properties, null);
-	}
 
 	/**
 	 *
 	 * @param event
 	 */
 	public void addEvent(Event event) {
-		if (!disableAnalytics) {
-			RokoLogger.addEvent(event);
-		}
+
 	}
 
+	@SuppressLint("setJavaScriptEnabled")
 	private void runChartIQ(final String chartIQUrl, final CallbackStart callbackStart) {
 		ChartIQ.this.post(new Runnable() {
 			@Override
@@ -311,24 +243,11 @@ public class ChartIQ extends WebView {
 
 	/**
 	 *
-	 * @param apiToken
 	 * @param chartIQUrl
 	 * @param callbackStart
 	 */
-	public void start(String apiToken, final String chartIQUrl, final CallbackStart callbackStart) {
-		if (apiToken.length() > 0) {
-			RokoMobi.start(getContext(), apiToken, new RokoLogger.CallbackStart() {
-				@Override
-				public void load() {
-					disableAnalytics = false;
-					runChartIQ(chartIQUrl, callbackStart);
-				}
-			});
-		} else {
-			disableAnalytics = true;
-			runChartIQ(chartIQUrl, callbackStart);
-		}
-
+	public void start(final String chartIQUrl, final CallbackStart callbackStart) {
+		runChartIQ(chartIQUrl, callbackStart);
 	}
 
 	/**
@@ -1231,10 +1150,6 @@ public class ChartIQ extends WebView {
 
 	public interface CallbackStart {
 		void onStart();
-	}
-
-	public interface SetUserCallback {
-		void onSetUser(User user);
 	}
 
 	public interface SetCustomPropertyCallback {

@@ -21,34 +21,13 @@ class AppLifecycle implements Application.ActivityLifecycleCallbacks {
     private AtomicBoolean foreground = new AtomicBoolean(), paused = new AtomicBoolean();
     private Handler handler = new Handler();
     private Task check;
-    private List<RokoLifecycle.Callback> listeners = new CopyOnWriteArrayList<RokoLifecycle.Callback>();
+//    private List<RokoLifecycle.Callback> listeners = new CopyOnWriteArrayList<RokoLifecycle.Callback>();
 
     private AppLifecycle() {
     }
 
-    public static void addListener(RokoLifecycle.Callback listener) {
-        if (instance != null) {
-            instance.listeners.add(listener);
-        }
-    }
-
-    public static void removeListener(RokoLifecycle.Callback listener) {
-        if (instance != null) {
-            try {
-                instance.listeners.remove(listener);
-            } catch (Exception exc) {
-//                Log.e(TAG, "Listener threw exception!", exc);
-            }
-        }
-    }
-
     public static void init() {
-        if (instance == null) {
-
-            instance = new AppLifecycle();
-            Application application = (Application) RokoMobi.getInstance().getApplicationContext();
-            application.registerActivityLifecycleCallbacks(instance);
-        }
+        if (instance == null) instance = new AppLifecycle();
     }
 
     @Override
@@ -72,20 +51,7 @@ class AppLifecycle implements Application.ActivityLifecycleCallbacks {
         }
 
         if (!foreground.get() && wasBackground) {
-//            Log.i(TAG, "App: foreground");
-            RokoMobi.getInstance().appActive = true;
-            RokoLogger.addEvent(new Event("_ROKO.Active User"));
-
             sessionTime = System.currentTimeMillis();
-            //Log.i("timeSpent 1","sessionTime="+sessionTime);
-            for (RokoLifecycle.Callback l : listeners) {
-                try {
-                    l.appForeground();
-                } catch (Exception exc) {
-//                    Log.e(TAG, "Listener threw exception!", exc);
-                }
-            }
-
         }
         foreground.set(true);
     }
@@ -107,21 +73,9 @@ class AppLifecycle implements Application.ActivityLifecycleCallbacks {
             public void execute() {
                 if (foreground.get() && paused.get()) {
                     foreground.set(false);
-//                    Log.i(TAG, "App: background");
-                    RokoMobi.getInstance().appActive = false;
-                    //Log.i("timeSpent 2","sessionTime="+sessionTime);
                     if (sessionTime > 0) {
                         long timeSpent = (System.currentTimeMillis() - sessionTime) / 1000;
-                        //Log.i("timeSpent","timeSpent="+timeSpent);
-                        RokoLogger.addEvent(new Event("_ROKO.Inactive User").set("Time spent", timeSpent));
                         sessionTime = 0;
-                        for (RokoLifecycle.Callback l : listeners) {
-                            try {
-                                l.appBackground();
-                            } catch (Exception exc) {
-//                                Log.e(TAG, "Listener threw exception!", exc);
-                            }
-                        }
                     }
                 }
             }
