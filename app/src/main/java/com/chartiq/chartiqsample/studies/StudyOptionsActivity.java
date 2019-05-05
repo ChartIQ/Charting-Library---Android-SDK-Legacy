@@ -24,6 +24,7 @@ import com.chartiq.chartiqsample.ColorAdapter;
 import com.chartiq.chartiqsample.R;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -153,8 +154,13 @@ public class StudyOptionsActivity extends AppCompatActivity {
             if (parameter.type != null) {
                 switch (parameter.type) {
                     case "select":
+
                         if (studyParams.containsKey(parameter.name) && !"field".equals(studyParams.get(parameter.name))) {
                             parameter.value = studyParams.get(parameter.name);
+                            if(parameter.value.getClass() == ArrayList.class){
+                                ArrayList<String> test = (ArrayList<String>) parameter.value;
+                                parameter.value = test.get(0);
+                            }
                         }
                         bindSelect(parameter);
                         break;

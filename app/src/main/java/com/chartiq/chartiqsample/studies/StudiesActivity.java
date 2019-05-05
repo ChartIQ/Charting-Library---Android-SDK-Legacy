@@ -163,7 +163,7 @@ public class StudiesActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 for (Study s : lastSelection) {
-                    chartIQ.addStudy(s);
+                    chartIQ.addStudy(s, true);
                 }
                 activeStudies.addAll(lastSelection);
                 studiesAdapter.setActiveStudiesList(activeStudies);

@@ -476,11 +476,17 @@ public class ChartIQ extends WebView {
 	 *
 	 * @param study
 	 */
-	public void addStudy(Study study) {
+	public void addStudy(Study study, boolean firstLoad) {
+		Map<String, Object> inputs = study.inputs;
+		Map<String, Object> outputs = study.outputs;
+		if(firstLoad){
+			inputs = null;
+			outputs = null;
+		}
 		if (study.type == null) {
-			addStudy(study.shortName, study.inputs, study.outputs);
+			addStudy(study.shortName, inputs, outputs);
 		} else {
-			addStudy(study.type, study.inputs, study.outputs);
+			addStudy(study.type, inputs, outputs);
 		}
 		addEvent(new Event("CHIQ_addStudy").set("studyName", study.name));
 	}

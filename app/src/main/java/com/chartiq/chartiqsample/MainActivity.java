@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int CHART_OPTIONS_REQUEST_CODE = 3;
     private static final int REFRESH_INTERVAL = 1;
     private static final String defaultSymbol = "AAPL";
-    public static final String chartUrl ="http://yourdeployment/sample-template-native-sdk.html";
+    public static final String chartUrl ="http://192.168.86.212/default/sample-template-native-sdk.html";
     ChartIQ chartIQ;
 
     //top toolbar
@@ -605,7 +605,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 activeStudies = (ArrayList<Study>) data.getSerializableExtra(ACTIVE_STUDIES);
                 for (Study activeStudy : activeStudies) {
-                    chartIQ.addStudy(activeStudy);
+                    chartIQ.addStudy(activeStudy, false);
                 }
             }
         } else {
