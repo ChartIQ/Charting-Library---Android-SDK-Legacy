@@ -349,6 +349,21 @@ public class ChartIQ extends WebView {
 	}
 
 	/**
+	 * Checks to see if the chart is finished loading
+	 * @return Promise<Boolean>
+	 */
+	public Promise<Boolean> isChartAvailable() {
+		final Promise<Boolean> promise = new Promise<>();
+		executeJavascript("isChartAvailable()", new ValueCallback<String>() {
+			@Override
+			public void onReceiveValue(String value) {
+				promise.setResult(new Boolean(value));
+			}
+		});
+		return promise;
+	}
+
+	/**
 	 *
 	 * @param symbol
 	 */
