@@ -605,7 +605,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 activeStudies = (ArrayList<Study>) data.getSerializableExtra(ACTIVE_STUDIES);
                 for (Study activeStudy : activeStudies) {
-                    chartIQ.addStudy(activeStudy);
+                    chartIQ.addStudy(activeStudy, false);
                 }
             }
         } else {
