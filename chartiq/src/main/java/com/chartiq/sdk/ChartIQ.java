@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ChartIQ extends WebView {
-    public String chartiqSdkVersion = "2.0.0";
-    public String applicationVersion = "2.0.0";
+    public String chartiqSdkVersion = "2.0.1";
+    public String applicationVersion = "2.0.1";
 	private static final String CHART_IQ_JS_OBJECT = "stxx";
 	public int refreshInterval = 0;
 	private boolean showDebugInfo;
