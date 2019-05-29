@@ -28,10 +28,9 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ChartIQ extends WebView {
-    public String chartiqSdkVersion = "2.0.1";
-    public String applicationVersion = "2.0.1";
+    public String chartiqSdkVersion = "2.1.0";
+    public String applicationVersion = "2.1.0";
 	private static final String CHART_IQ_JS_OBJECT = "stxx";
-	public int refreshInterval = 0;
 	private boolean showDebugInfo;
 	private DataSource dataSource;
 	private ValueCallback EMPTY_CALLBACK = new ValueCallback() {
@@ -323,10 +322,8 @@ public class ChartIQ extends WebView {
 			dataMethod = method;
 		}
 
-		executeJavascript("determineOs();");
-
 		if (dataMethod == DataMethod.PULL) {
-			executeJavascript("attachQuoteFeed(" + getRefreshInterval() + ")", null);
+			System.out.println("If you want to add your quotefeed check your html template");
 		} else {
 			this.invoke("newChart", toastCallback, symbol);
 		}
@@ -622,7 +619,6 @@ public class ChartIQ extends WebView {
 	 * @return
 	 */
 	public Promise<Study[]> getActiveStudies() {
-		executeJavascript("determineOs();");
 		String script = "getActiveStudies();";
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			final Promise<Study[]> promise = new Promise<>();
@@ -651,7 +647,6 @@ public class ChartIQ extends WebView {
 	 * @return
 	 */
 	public Promise<String> getStudyInputParameters(String studyName) {
-		executeJavascript("determineOs();");
 		String script = "getStudyParameters(\"" + studyName + "\" , \"inputs\");";
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			final Promise<String> promise = new Promise<>();
@@ -679,7 +674,6 @@ public class ChartIQ extends WebView {
 	 * @return
 	 */
 	public Promise<String> getStudyOutputParameters(String studyName) {
-		executeJavascript("determineOs();");
 		String script = "getStudyParameters(\"" + studyName + "\" , \"outputs\");";
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			final Promise<String> promise = new Promise<>();
@@ -707,7 +701,6 @@ public class ChartIQ extends WebView {
 	 * @return
 	 */
 	public Promise<String> getStudyParameters(String studyName) {
-		executeJavascript("determineOs();");
 		String script = "getStudyParameters(\"" + studyName + "\" , \"parameters\");";
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			final Promise<String> promise = new Promise<>();
@@ -1115,14 +1108,6 @@ public class ChartIQ extends WebView {
 		} else {
 			post(runnable);
 		}
-	}
-
-	public int getRefreshInterval() {
-		return this.refreshInterval;
-	}
-
-	public void setRefreshInterval(int refreshInterval) {
-		this.refreshInterval = refreshInterval;
 	}
 
 	ValueCallback getCallBackFromArgs(Object[] args) {
