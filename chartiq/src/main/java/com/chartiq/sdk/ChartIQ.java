@@ -323,7 +323,7 @@ public class ChartIQ extends WebView {
 		}
 
 		if (dataMethod == DataMethod.PULL) {
-			System.out.println("If you want to add your quotefeed check your html template");
+			System.out.println("If you want to add a quotefeed please do so in your javascript code.");
 		} else {
 			this.invoke("newChart", toastCallback, symbol);
 		}
