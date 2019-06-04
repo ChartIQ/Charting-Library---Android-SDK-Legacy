@@ -28,7 +28,7 @@ publishing {
         aar(MavenPublication) {
             groupId = 'com.chartiq'
             artifactId 'chartiq'
-            version = "2.0.0"
+            version = "2.1.1"
             artifact "${project.buildDir}/outputs/aar/chartiq-release.aar"
 
             pom.withXml {
