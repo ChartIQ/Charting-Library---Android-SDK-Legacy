@@ -261,7 +261,26 @@ public class StudyOptionsActivity extends AppCompatActivity {
         if ("auto".equals(parameter.color)) {
             color.setBackgroundColor(Color.BLACK);
         } else {
-            color.setBackgroundColor(Color.parseColor(parameter.color));
+            try{
+                if(parameter.color.contains("rgb")) {
+                    String subString = parameter.color.substring(parameter.color.indexOf('(') + 1, parameter.color.indexOf(')'));
+                    String rgbColors[] = subString.split(",");
+                    int parsedColor = 0;
+                    if(rgbColors.length == 4) { // contains an alpha value
+                        parsedColor = Color.argb(Integer.parseInt(rgbColors[3].trim()), Integer.parseInt(rgbColors[0].trim()),
+                                Integer.parseInt(rgbColors[1].trim()), Integer.parseInt(rgbColors[2].trim()));
+                    } else {
+                        parsedColor = Color.rgb(Integer.parseInt(rgbColors[0].trim()),
+                                Integer.parseInt(rgbColors[1].trim()), Integer.parseInt(rgbColors[2].trim()));
+                    }
+
+                    color.setBackgroundColor(parsedColor);
+                } else {
+                    color.setBackgroundColor(Color.parseColor(parameter.color));
+                }
+            }catch(Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
