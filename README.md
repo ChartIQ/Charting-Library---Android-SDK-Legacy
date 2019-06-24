@@ -1,7 +1,7 @@
 # Charting-Library---Android-SDK
 Native Android SDK for the ChartIQ javaScript [Charting Library](https://documentation.chartiq.com).
 
-This SDK has been designed to support a [basic application](https://github.com/ChartIQ/Charting-Library---iOS-Sample-App) and may need to be extended to support more elaborate implementations. This can be done by adding additional code to invoke Javascript functions directly. Feel free to contact us and request sample code and guidance on how to extend the SDK.
+This SDK has been designed to support a [basic application](https://github.com/ChartIQ/Charting-Library---Android-Sample-App) and may need to be extended to support more elaborate implementations. This can be done by adding additional code to invoke Javascript functions directly. Feel free to contact us and request sample code and guidance on how to extend the SDK.
 
 ## Questions and support
 
