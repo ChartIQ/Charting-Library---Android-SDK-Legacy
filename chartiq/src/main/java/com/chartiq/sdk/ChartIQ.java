@@ -478,8 +478,8 @@ public class ChartIQ extends WebView {
 	 * @param inputs
 	 * @param outputs
 	 */
-	public void addStudy(String studyName, Map<String, Object> inputs, Map<String, Object> outputs) {
-		String script = "addStudy(" + buildArgumentStringFromArgs(studyName, inputs, outputs) + ")";
+	public void addStudy(String studyName, Map<String, Object> inputs, Map<String, Object> outputs, Map<String, Object> parameters) {
+		String script = "addStudy(" + buildArgumentStringFromArgs(studyName, inputs, outputs, parameters) + ")";
 		executeJavascript(script, toastCallback);
 		addEvent(new Event("CHIQ_addStudy").set("studyName", studyName));
 	}
@@ -491,14 +491,15 @@ public class ChartIQ extends WebView {
 	public void addStudy(Study study, boolean firstLoad) {
 		Map<String, Object> inputs = study.inputs;
 		Map<String, Object> outputs = study.outputs;
+		Map<String, Object> parameters = study.parameters;
 		if(firstLoad){
 			inputs = null;
 			outputs = null;
 		}
 		if (study.type == null) {
-			addStudy(study.shortName, inputs, outputs);
+			addStudy(study.shortName, inputs, outputs, parameters);
 		} else {
-			addStudy(study.type, inputs, outputs);
+			addStudy(study.type, inputs, outputs, parameters);
 		}
 		addEvent(new Event("CHIQ_addStudy").set("studyName", study.name));
 	}

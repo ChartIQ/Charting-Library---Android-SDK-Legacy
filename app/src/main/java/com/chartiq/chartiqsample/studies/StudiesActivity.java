@@ -165,10 +165,21 @@ public class StudiesActivity extends AppCompatActivity {
                 for (Study s : lastSelection) {
                     chartIQ.addStudy(s, true);
                 }
-                activeStudies.addAll(lastSelection);
-                studiesAdapter.setActiveStudiesList(activeStudies);
-                studiesAdapter.getAvailableStudies().removeAll(lastSelection);
-                clearSelection();
+                //activeStudies.addAll(lastSelection);
+                //studiesAdapter.setActiveStudiesList(activeStudies);
+                //studiesAdapter.getAvailableStudies().removeAll(lastSelection);
+                //clearSelection();
+
+                chartIQ.getActiveStudies().than(new Promise.Callback<Study[]>() {
+                    @Override
+                    public void call(Study[] studies) {
+                        activeStudies.addAll(lastSelection);
+                        //activeStudies = new ArrayList<>(Arrays.asList(studies));
+                        studiesAdapter.setActiveStudiesList(activeStudies);
+                        //studiesAdapter.getAvailableStudies().removeAll(lastSelection);
+                        clearSelection();
+                    }
+                });
             }
         });
         removeButton = findViewById(R.id.remove_button);

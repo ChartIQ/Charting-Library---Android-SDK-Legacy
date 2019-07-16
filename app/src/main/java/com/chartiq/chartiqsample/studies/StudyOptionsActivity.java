@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StudyOptionsActivity extends AppCompatActivity {
@@ -47,6 +48,9 @@ public class StudyOptionsActivity extends AppCompatActivity {
     private StudyParameter[] parameters;
     private TextView selectView;
 
+    HashMap<String, String> studyParameterColors = new HashMap<>();
+    HashMap<String, String> studyParameterValues = new HashMap<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +63,13 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
         studyTitle = (TextView) findViewById(R.id.study_title);
         optionsLayout = (LinearLayout) findViewById(R.id.options);
+
+        // map.put("Show Zones", "studyOverZones");
+        studyParameterColors.put("OverBought", "studyOverBoughtColor");
+        studyParameterColors.put("OverSold", "studyOverSoldColor");
+        studyParameterValues.put("OverBought", "studyOverBoughtValue");
+        studyParameterValues.put("OverSold", "studyOverSoldValue");
+        //map.put("""studyOverZonesEnabled")
 
         if (getIntent().hasExtra("study")) {
             study = (Study) getIntent().getSerializableExtra("study");
@@ -90,7 +101,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
                 exception.printStackTrace();
 
             }
-            if (study.outputs != null) {
+            if (study.outputs != null || outputs != null) {
                 bindStudyOptions(outputs, study.outputs);
             }
         }
@@ -137,16 +148,61 @@ public class StudyOptionsActivity extends AppCompatActivity {
     private void setColor(View view) {
         colorPalette.dismiss();
         currentColorView.setBackgroundColor(Color.parseColor(String.valueOf(view.getTag())));
-        if (study.outputs != null) {
+        String parameterValue = studyParameterColors.get(colorOptionName);
+        if(parameterValue != null) { // parameter entry, need to drill down to properly set the value
+            Map<String, Object> oldParameters = (Map<String, Object>) study.parameters.get("init");
+            if(oldParameters == null) {
+                oldParameters = study.parameters;
+            }
+            for (Map.Entry<String,Object> entry : oldParameters.entrySet()) {
+                if (entry.getKey().equals(parameterValue)) {
+                    //entry.setValue(String.valueOf(view.getTag()));
+                    String value = String.valueOf(view.getTag());
+                    oldParameters.put(entry.getKey(), value);
+                    break;
+                }
+            }
+            //study.parameters.put("init", oldParameters);
+            study.parameters = oldParameters;
+            study.modifiedParameters = oldParameters;
+        } else if (study.outputs != null) {
             study.outputs.put(colorOptionName, String.valueOf(view.getTag()));
         }
     }
 
     private void bindStudyOptions(StudyParameter[] array, final Map<String, Object> studyParams) {
         for (final StudyParameter parameter : array) {
-            if (parameter.color != null) {
-                if (studyParams.containsKey(parameter.name)) {
+            String heading = parameter.heading;
+            boolean isParameterValue = false;
+            if(studyParameterColors.get(heading) != null || studyParameterValues.get(heading) != null) {
+                isParameterValue = true;
+            }
+            if(isParameterValue) {
+                String parameterValue = studyParameterColors.get(heading);
+                HashMap<String, Object> oldParameters = (HashMap<String, Object>) study.parameters;
+                for (Map.Entry<String,Object> entry : oldParameters.entrySet()) {
+                    if (entry.getKey().equals(parameterValue)) {
+                        parameter.color = String.valueOf(entry.getValue());
+                        break;
+                    }
+                }
+                bindColor(parameter);
+            } else if (parameter.color != null || parameter.defaultOutput != null || parameter.defaultColor != null) {
+                // get the color from the client-side Study object
+                if (studyParams != null && studyParams.containsKey(parameter.name)) {
                     parameter.color = String.valueOf(studyParams.get(parameter.name));
+                }
+                // get the color from the study definition
+                else if(parameter.color != null) {
+                    parameter.color = String.valueOf(parameter.color);
+                }
+                // get the color from the study descriptor default value
+                else if(parameter.defaultOutput != null) {
+                    parameter.color = String.valueOf(parameter.defaultOutput);
+                }
+                // parameters have a defaultColor field
+                else if(parameter.defaultColor != null) {
+                    parameter.color = String.valueOf(parameter.defaultColor);
                 }
                 bindColor(parameter);
             }
@@ -235,7 +291,10 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                studyParams.put(parameter.name, editText.getText().toString());
+                String parameterValueName = studyParameterValues.get(parameter.name);
+                String fieldName = parameterValueName != null ? parameterValueName : parameter.name;
+
+                studyParams.put(fieldName, editText.getText().toString());
             }
 
             @Override
@@ -260,30 +319,16 @@ public class StudyOptionsActivity extends AppCompatActivity {
         });
         if ("auto".equals(parameter.color)) {
             color.setBackgroundColor(Color.BLACK);
-        } else {
-            try{
-                if(parameter.color.contains("rgb")) {
-                    String subString = parameter.color.substring(parameter.color.indexOf('(') + 1, parameter.color.indexOf(')'));
-                    String rgbColors[] = subString.split(",");
-                    int parsedColor = 0;
-                    int alphaValue = 255;
-
-                    // contains an alpha value
-                    if(rgbColors.length == 4) {
-                        double value = Double.parseDouble(rgbColors[3].trim());
-                        value = Math.floor(value >= 1.0 ? 255 : value * 256.0); // use 256 for floating point precision when value is less than 1.0
-                        alphaValue = (int) value;
-                    }
-                    parsedColor = Color.argb(alphaValue, Integer.parseInt(rgbColors[0].trim()),
-                            Integer.parseInt(rgbColors[1].trim()), Integer.parseInt(rgbColors[2].trim()));
-
-                    color.setBackgroundColor(parsedColor);
-                } else {
-                    color.setBackgroundColor(Color.parseColor(parameter.color));
-                }
-            }catch(Exception e) {
-                e.printStackTrace();
+        } else if(parameter.color != null){
+            color.setBackgroundColor(Color.parseColor(parameter.color));
+        } else if(parameter.defaultColor != null) {
+            if("auto".equals(parameter.defaultColor)) {
+                color.setBackgroundColor(Color.BLACK);
+            } else {
+                color.setBackgroundColor(Color.parseColor(String.valueOf(parameter.defaultColor)));
             }
+        } else {
+            color.setBackgroundColor(Color.BLACK);
         }
     }
 
