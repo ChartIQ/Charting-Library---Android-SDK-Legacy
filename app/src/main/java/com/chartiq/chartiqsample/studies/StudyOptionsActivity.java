@@ -64,12 +64,11 @@ public class StudyOptionsActivity extends AppCompatActivity {
         studyTitle = (TextView) findViewById(R.id.study_title);
         optionsLayout = (LinearLayout) findViewById(R.id.options);
 
-        // map.put("Show Zones", "studyOverZones");
         studyParameterColors.put("OverBought", "studyOverBoughtColor");
         studyParameterColors.put("OverSold", "studyOverSoldColor");
         studyParameterValues.put("OverBought", "studyOverBoughtValue");
         studyParameterValues.put("OverSold", "studyOverSoldValue");
-        //map.put("""studyOverZonesEnabled")
+        studyParameterValues.put("Show Zones", "studyOverZonesEnabled");
 
         if (getIntent().hasExtra("study")) {
             study = (Study) getIntent().getSerializableExtra("study");
@@ -150,21 +149,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
         currentColorView.setBackgroundColor(Color.parseColor(String.valueOf(view.getTag())));
         String parameterValue = studyParameterColors.get(colorOptionName);
         if(parameterValue != null) { // parameter entry, need to drill down to properly set the value
-            Map<String, Object> oldParameters = (Map<String, Object>) study.parameters.get("init");
-            if(oldParameters == null) {
-                oldParameters = study.parameters;
-            }
-            for (Map.Entry<String,Object> entry : oldParameters.entrySet()) {
-                if (entry.getKey().equals(parameterValue)) {
-                    //entry.setValue(String.valueOf(view.getTag()));
-                    String value = String.valueOf(view.getTag());
-                    oldParameters.put(entry.getKey(), value);
-                    break;
-                }
-            }
-            //study.parameters.put("init", oldParameters);
-            study.parameters = oldParameters;
-            study.modifiedParameters = oldParameters;
+            changeStudyParameter(parameterValue, study, String.valueOf(view.getTag()));
         } else if (study.outputs != null) {
             study.outputs.put(colorOptionName, String.valueOf(view.getTag()));
         }
@@ -173,15 +158,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
     private void bindStudyOptions(StudyParameter[] array, final Map<String, Object> studyParams) {
         for (final StudyParameter parameter : array) {
             String heading = parameter.heading;
-            boolean isParameterValue = false;
-            if(studyParameterColors.get(heading) != null || studyParameterValues.get(heading) != null) {
-                isParameterValue = true;
-            }
-            if(isParameterValue) {
-                String parameterValue = studyParameterColors.get(heading);
+            String parameterColorValue = studyParameterColors.get(heading);
+
+            if(parameterColorValue != null) {
                 HashMap<String, Object> oldParameters = (HashMap<String, Object>) study.parameters;
                 for (Map.Entry<String,Object> entry : oldParameters.entrySet()) {
-                    if (entry.getKey().equals(parameterValue)) {
+                    if (entry.getKey().equals(parameterColorValue)) {
                         parameter.color = String.valueOf(entry.getValue());
                         break;
                     }
@@ -200,17 +182,23 @@ public class StudyOptionsActivity extends AppCompatActivity {
                 else if(parameter.defaultOutput != null) {
                     parameter.color = String.valueOf(parameter.defaultOutput);
                 }
-                // parameters have a defaultColor field
-                else if(parameter.defaultColor != null) {
-                    parameter.color = String.valueOf(parameter.defaultColor);
-                }
                 bindColor(parameter);
             }
 
             if (parameter.type != null) {
+                String parameterOldValue = studyParameterValues.get(heading);
+                Object parameterNewValue = null;
+                if (parameterOldValue != null) {
+                    HashMap<String, Object> oldParameters = (HashMap<String, Object>) study.parameters;
+                    for (Map.Entry<String, Object> entry : oldParameters.entrySet()) {
+                        if (entry.getKey().equals(parameterOldValue)) {
+                            parameterNewValue = entry.getValue();
+                            break;
+                        }
+                    }
+                }
                 switch (parameter.type) {
                     case "select":
-
                         if (studyParams.containsKey(parameter.name) && !"field".equals(studyParams.get(parameter.name))) {
                             parameter.value = studyParams.get(parameter.name);
                             if(parameter.value.getClass() == ArrayList.class){
@@ -221,19 +209,28 @@ public class StudyOptionsActivity extends AppCompatActivity {
                         bindSelect(parameter);
                         break;
                     case "number":
-                        if (studyParams.containsKey(parameter.name)) {
+                        if(parameterNewValue != null) {
+                            parameter.value = parameterNewValue;
+                        } else if (studyParams.containsKey(parameter.name)) {
                             parameter.value = studyParams.get(parameter.name);
                         }
                         bindNumber(studyParams, parameter);
                         break;
                     case "text":
-                        if (studyParams.containsKey(parameter.name)) {
-                            parameter.value = studyParams.get(parameter.name);
+                        if(parameterNewValue != null) {
+                            parameter.value = parameterNewValue;
+                        } else {
+                            if (studyParams.containsKey(parameter.name)) {
+                                parameter.value = studyParams.get(parameter.name);
+                            }
                         }
+
                         bindString(studyParams, parameter);
                         break;
                     case "checkbox":
-                        if (studyParams.containsKey(parameter.name)) {
+                        if(parameterNewValue != null) {
+                            parameter.value = parameterNewValue;
+                        } else if (studyParams.containsKey(parameter.name)) {
                             parameter.value = studyParams.get(parameter.name);
                         }
                         bindBoolean(studyParams, parameter);
@@ -271,7 +268,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
         switchView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                studyParams.put(parameter.name, switchView.isChecked());
+                String parameterValue = studyParameterValues.get(parameter.heading);
+                if(parameterValue != null) {
+                    changeStudyParameter(parameterValue, study, switchView.isChecked());
+                } else {
+                    studyParams.put(parameter.name, switchView.isChecked());
+                }
             }
         });
     }
@@ -291,10 +293,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String parameterValueName = studyParameterValues.get(parameter.name);
-                String fieldName = parameterValueName != null ? parameterValueName : parameter.name;
-
-                studyParams.put(fieldName, editText.getText().toString());
+                String parameterValue = studyParameterValues.get(parameter.heading);
+                if(parameterValue != null) {
+                    changeStudyParameter(parameterValue, study, editText.getText().toString());
+                } else {
+                    studyParams.put(parameter.name, editText.getText().toString());
+                }
             }
 
             @Override
@@ -302,6 +306,20 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void changeStudyParameter(String parameterName, Study study, Object value) {
+        Map<String, Object> currentParameters = (Map<String, Object>) study.parameters.get("init");
+        if(currentParameters == null) {
+            currentParameters = study.parameters;
+        }
+        for (Map.Entry<String,Object> entry : currentParameters.entrySet()) {
+            if (entry.getKey().equals(parameterName)) {
+                currentParameters.put(entry.getKey(), value);
+                break;
+            }
+        }
+        study.parameters = currentParameters; // replace with potential new values
     }
 
     private void bindColor(final StudyParameter parameter) {
@@ -347,7 +365,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                studyParams.put(parameter.name, editText.getText().toString());
+                String parameterValue = studyParameterValues.get(parameter.heading);
+                if(parameterValue != null) {
+                    changeStudyParameter(parameterValue, study, editText.getText().toString());
+                } else {
+                    studyParams.put(parameter.name, editText.getText().toString());
+                }
             }
 
             @Override
