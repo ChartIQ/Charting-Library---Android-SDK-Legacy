@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int STUDIES_REQUEST_CODE = 2;
     private static final int CHART_OPTIONS_REQUEST_CODE = 3;
     private static final String defaultSymbol = "AAPL";
-    public static final String chartUrl ="http://192.168.2.42/default/sample-template-native-sdk.html";
+    public static final String chartUrl ="http://yourdeployment/sample-template-native-sdk.html";
     ChartIQ chartIQ;
 
     //top toolbar
@@ -153,25 +153,9 @@ public class MainActivity extends AppCompatActivity {
 
         chartIQ.start(chartUrl, new ChartIQ.CallbackStart() {
             @Override
-
             public void onStart() {
-//                @Override
-                try {
-
-                    chartIQ.setDataMethod(ChartIQ.DataMethod.PULL, defaultSymbol);
-                    chartIQ.setSymbol(defaultSymbol);
-
-                    //Thread.sleep(5000);
-                    chartIQ.isChartAvailable().than(new Promise.Callback<Boolean>() {
-                        @Override
-                        public void call(Boolean chartLoaded) {
-                            System.out.println("IS THE CHART LOADED");
-                            System.out.println(chartLoaded);
-                        }
-                    });
-                } catch (Exception e) {
-
-                }
+                chartIQ.setDataMethod(ChartIQ.DataMethod.PULL, defaultSymbol);
+                chartIQ.setSymbol(defaultSymbol);
             }
         });
 
