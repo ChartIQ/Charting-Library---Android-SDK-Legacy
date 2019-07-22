@@ -90,11 +90,6 @@ public class StudiesActivity extends AppCompatActivity {
         }
         if (getIntent().hasExtra(ACTIVE_STUDIES)) {
             activeStudies = (ArrayList<Study>) getIntent().getExtras().getSerializable(ACTIVE_STUDIES);
-            if (activeStudies != null) {
-                for (Study s : activeStudies) {
-                    chartIQ.addStudy(s, false);
-                }
-            }
             Collections.sort(activeStudies, new Comparator<Study>() {
                 @Override
                 public int compare(Study o1, Study o2) {

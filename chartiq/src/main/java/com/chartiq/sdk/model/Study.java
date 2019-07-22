@@ -18,7 +18,6 @@ public class Study implements Serializable{
     public Map<String, Object> outputs;
     public Boolean overlay;
     public Map<String, Object> parameters;
-    public Map<String, Object> modifiedParameters;
     public String range;
     public String shortName;
     public Boolean underlay;

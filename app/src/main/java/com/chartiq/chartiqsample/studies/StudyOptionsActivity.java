@@ -64,11 +64,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
         studyTitle = (TextView) findViewById(R.id.study_title);
         optionsLayout = (LinearLayout) findViewById(R.id.options);
 
+        // map values for the study parameters
         studyParameterColors.put("OverBought", "studyOverBoughtColor");
         studyParameterColors.put("OverSold", "studyOverSoldColor");
         studyParameterValues.put("OverBought", "studyOverBoughtValue");
         studyParameterValues.put("OverSold", "studyOverSoldValue");
-        studyParameterValues.put("Show Zones", "studyOverZonesEnabled");
+        studyParameterValues.put("Show Zones", "studyOverZones");
 
         if (getIntent().hasExtra("study")) {
             study = (Study) getIntent().getSerializableExtra("study");
@@ -160,6 +161,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
             String heading = parameter.heading;
             String parameterColorValue = studyParameterColors.get(heading);
 
+            // get the study parameter color, which has another fieldName from the heading in the parameter
             if(parameterColorValue != null) {
                 HashMap<String, Object> oldParameters = (HashMap<String, Object>) study.parameters;
                 for (Map.Entry<String,Object> entry : oldParameters.entrySet()) {
@@ -191,6 +193,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
                 if (parameterOldValue != null) {
                     HashMap<String, Object> oldParameters = (HashMap<String, Object>) study.parameters;
                     for (Map.Entry<String, Object> entry : oldParameters.entrySet()) {
+                        // ChartIQ parameter boolean follows "fieldNameEnabled" format, where the
+                        // "Enabled" is dynamically added in the library study dialog. Which
+                        // is not accessible on the mobile side.
+                        if(entry.getValue() instanceof Boolean) {
+                            parameterOldValue += "Enabled";
+                        }
                         if (entry.getKey().equals(parameterOldValue)) {
                             parameterNewValue = entry.getValue();
                             break;
@@ -231,7 +239,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
                         if(parameterNewValue != null) {
                             parameter.value = parameterNewValue;
                         } else if (studyParams.containsKey(parameter.name)) {
-                            parameter.value = studyParams.get(parameter.name);
+                            parameter.value = studyParams.get(parameter.name) + "Enabled";
                         }
                         bindBoolean(studyParams, parameter);
                         break;
@@ -270,7 +278,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String parameterValue = studyParameterValues.get(parameter.heading);
                 if(parameterValue != null) {
-                    changeStudyParameter(parameterValue, study, switchView.isChecked());
+                    changeStudyParameter(parameterValue + "Enabled", study, switchView.isChecked());
                 } else {
                     studyParams.put(parameter.name, switchView.isChecked());
                 }
@@ -308,6 +316,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Helper method to ensure that the correct study parameter value is added to the client side study object
+     * @param parameterName
+     * @param study
+     * @param value
+     */
     private void changeStudyParameter(String parameterName, Study study, Object value) {
         Map<String, Object> currentParameters = (Map<String, Object>) study.parameters.get("init");
         if(currentParameters == null) {
