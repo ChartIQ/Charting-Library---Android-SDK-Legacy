@@ -48,8 +48,8 @@ public class StudyOptionsActivity extends AppCompatActivity {
     private StudyParameter[] parameters;
     private TextView selectView;
 
-    HashMap<String, String> studyParameterColors = new HashMap<>();
-    HashMap<String, String> studyParameterValues = new HashMap<>();
+    private HashMap<String, String> studyParameterColors = new HashMap<>();
+    private HashMap<String, String> studyParameterValues = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -255,7 +255,16 @@ public class StudyOptionsActivity extends AppCompatActivity {
         optionName.setText(parameter.heading);
         final TextView textView = (TextView) v.findViewById(R.id.value);
         selectView = textView;
-        textView.setText(String.valueOf(parameter.value));
+        String displayText = (String) parameter.value;
+        // Use the default value for Moving Average instead of mapping the value
+        if(parameter.heading.contains("Moving Average")) {
+            displayText = (String) parameter.defaultInput;
+        }
+        // If there are display mappings be sure to get the correct display value
+        if(parameter.options != null && parameter.options.size() > 0) {
+            displayText = (String) parameter.options.get(displayText);
+        }
+        textView.setText(displayText);
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -46,8 +46,24 @@ public class StudySelectOptionActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent result = new Intent();
-                result.putExtra("chosenValue", String.valueOf(adapter.getItem(position)));
-                result.putExtra("parameter", getIntent().getSerializableExtra("parameter"));
+                String positionValue = String.valueOf(adapter.getItem(position));
+                StudyParameter parameter = null;
+                if (getIntent().hasExtra("parameter")) {
+                    parameter = (StudyParameter) getIntent().getSerializableExtra("parameter");
+                    parameter.value = positionValue;
+                    // if options exist get the mapped key value as that is the value needed by the study
+                    if (parameter.options != null) {
+                        for (HashMap.Entry<String, Object> entry : parameter.options.entrySet()) {
+                            if(entry.getValue().equals(positionValue)){
+                                String key = (String) entry.getKey();
+                                parameter.value = key;
+                            }
+                        }
+                    }
+                }
+
+                result.putExtra("chosenValue", positionValue);
+                result.putExtra("parameter", parameter);
                 setResult(RESULT_OK, result);
                 finish();
             }
