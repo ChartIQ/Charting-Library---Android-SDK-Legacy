@@ -26,7 +26,6 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StudyOptionsActivity extends AppCompatActivity {
@@ -38,6 +37,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
     Study study;
     HashMap<String, Object> defaultInputs = new HashMap<>();
     HashMap<String, Object> defaultOutputs = new HashMap<>();
+    HashMap<String, Object> defaultParameters = new HashMap<>();
     LinearLayout optionsLayout;
     private PopupWindow colorPalette;
     private RecyclerView colorRecycler;
@@ -50,6 +50,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
     private HashMap<String, String> studyParameterColors = new HashMap<>();
     private HashMap<String, String> studyParameterValues = new HashMap<>();
+    private HashMap<String, Object> studyFields = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +71,15 @@ public class StudyOptionsActivity extends AppCompatActivity {
         studyParameterValues.put("OverBought", "studyOverBoughtValue");
         studyParameterValues.put("OverSold", "studyOverSoldValue");
         studyParameterValues.put("Show Zones", "studyOverZones");
+        studyFields.put("Close", "Close");
+        studyFields.put("Open", "Open");
+        studyFields.put("High", "High");
+        studyFields.put("Low", "Low");
+        studyFields.put("Adj_Close", "Adj_Close");
+        studyFields.put("hl/2", "hl/2");
+        studyFields.put("hlc/3", "hlc/3");
+        studyFields.put("hlcc/4", "hlcc/4");
+        studyFields.put("ohlc/4", "ohlc/4");
 
         if (getIntent().hasExtra("study")) {
             study = (Study) getIntent().getSerializableExtra("study");
@@ -79,6 +89,9 @@ public class StudyOptionsActivity extends AppCompatActivity {
             }
             if (study.outputs != null) {
                 defaultOutputs = new HashMap<>(study.outputs);
+            }
+            if (study.parameters != null) {
+                defaultParameters = new HashMap<>(study.parameters);
             }
         }
 
@@ -172,15 +185,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
                 }
                 bindColor(parameter);
             } else if (parameter.color != null || parameter.defaultOutput != null || parameter.defaultColor != null) {
-                // get the color from the client-side Study object
                 if (studyParams != null && studyParams.containsKey(parameter.name)) {
                     parameter.color = String.valueOf(studyParams.get(parameter.name));
                 }
-                // get the color from the study definition
                 else if(parameter.color != null) {
                     parameter.color = String.valueOf(parameter.color);
                 }
-                // get the color from the study descriptor default value
                 else if(parameter.defaultOutput != null) {
                     parameter.color = String.valueOf(parameter.defaultOutput);
                 }
@@ -207,12 +217,8 @@ public class StudyOptionsActivity extends AppCompatActivity {
                 }
                 switch (parameter.type) {
                     case "select":
-                        if (studyParams.containsKey(parameter.name) && !"field".equals(studyParams.get(parameter.name))) {
-                            parameter.value = studyParams.get(parameter.name);
-                            if(parameter.value.getClass() == ArrayList.class){
-                                ArrayList<String> test = (ArrayList<String>) parameter.value;
-                                parameter.value = test.get(0);
-                            }
+                        if(parameter.name.toLowerCase().equals("field")) {
+                            parameter.options = studyFields;
                         }
                         bindSelect(parameter);
                         break;
@@ -413,12 +419,16 @@ public class StudyOptionsActivity extends AppCompatActivity {
     public void resetToDefaults(View view) {
         study.inputs = new HashMap<>(defaultInputs);
         study.outputs = new HashMap<>(defaultOutputs);
+        study.parameters = new HashMap<>(defaultParameters);
         optionsLayout.removeAllViews();
         if (inputs != null) {
             bindStudyOptions(inputs, study.inputs);
         }
         if (outputs != null) {
             bindStudyOptions(outputs, study.outputs);
+        }
+        if (parameters != null) {
+            bindStudyOptions(parameters, study.parameters);
         }
     }
 
