@@ -14,7 +14,7 @@ public class Promise<T> {
 
     }
 
-    public void than(Callback<T> callback) {
+    public void then(Callback<T> callback) {
         if (result != null) {
             callback.call(result);
         } else {

@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int STUDIES_REQUEST_CODE = 2;
     private static final int CHART_OPTIONS_REQUEST_CODE = 3;
     private static final String defaultSymbol = "AAPL";
-    public static final String chartUrl ="http://yourdeployment/sample-template-native-sdk.html";
+    public static final String chartUrl ="http://192.168.1.147/default/sample-template-native-sdk.html";
     ChartIQ chartIQ;
 
     //top toolbar
@@ -154,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
         chartIQ.start(chartUrl, new ChartIQ.CallbackStart() {
             @Override
             public void onStart() {
-//                @Override
                 chartIQ.setDataMethod(ChartIQ.DataMethod.PULL, defaultSymbol);
                 chartIQ.setSymbol(defaultSymbol);
             }
@@ -529,10 +528,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void startStudiesActivity(View view) {
         if (chartLoaded) {
-            chartIQ.getStudyList().than(new Promise.Callback<Study[]>() {
+            chartIQ.getStudyList().then(new Promise.Callback<Study[]>() {
                 @Override
                 public void call(final Study[] studies) {
-                    chartIQ.getActiveStudies().than(new Promise.Callback<Study[]>() {
+                    chartIQ.getActiveStudies().then(new Promise.Callback<Study[]>() {
                         @Override
                         public void call(Study[] array) {
                             Intent studiesIntent = new Intent(MainActivity.this, StudiesActivity.class);

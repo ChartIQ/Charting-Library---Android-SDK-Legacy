@@ -11,5 +11,6 @@ public class StudyParameter implements Serializable {
     Object value;
     Object defaultInput;
     Object defaultOutput;
+    Object defaultColor;
     HashMap<String, Object> options;
 }

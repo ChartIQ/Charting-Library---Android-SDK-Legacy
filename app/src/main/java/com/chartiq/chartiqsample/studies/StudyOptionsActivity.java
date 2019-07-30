@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StudyOptionsActivity extends AppCompatActivity {
@@ -37,6 +38,8 @@ public class StudyOptionsActivity extends AppCompatActivity {
     Study study;
     HashMap<String, Object> defaultInputs = new HashMap<>();
     HashMap<String, Object> defaultOutputs = new HashMap<>();
+    HashMap<String, String> studyParameterColors = new HashMap<>();
+    HashMap<String, String> studyParameterValues = new HashMap<>();
     LinearLayout optionsLayout;
     private PopupWindow colorPalette;
     private RecyclerView colorRecycler;
@@ -59,6 +62,13 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
         studyTitle = (TextView) findViewById(R.id.study_title);
         optionsLayout = (LinearLayout) findViewById(R.id.options);
+
+        // map values for the study parameters
+        studyParameterColors.put("OverBought", "studyOverBoughtColor");
+        studyParameterColors.put("OverSold", "studyOverSoldColor");
+        studyParameterValues.put("OverBought", "studyOverBoughtValue");
+        studyParameterValues.put("OverSold", "studyOverSoldValue");
+        studyParameterValues.put("Show Zones", "studyOverZones");
 
         if (getIntent().hasExtra("study")) {
             study = (Study) getIntent().getSerializableExtra("study");
@@ -90,7 +100,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
                 exception.printStackTrace();
 
             }
-            if (study.outputs != null) {
+            if (study.outputs != null || outputs != null) {
                 bindStudyOptions(outputs, study.outputs);
             }
         }
@@ -137,24 +147,64 @@ public class StudyOptionsActivity extends AppCompatActivity {
     private void setColor(View view) {
         colorPalette.dismiss();
         currentColorView.setBackgroundColor(Color.parseColor(String.valueOf(view.getTag())));
-        if (study.outputs != null) {
+        String parameterValue = studyParameterColors.get(colorOptionName);
+        if(parameterValue != null) { // parameter entry, need to drill down to properly set the value
+            changeStudyParameter(parameterValue, study, String.valueOf(view.getTag()));
+        } else if (study.outputs != null) {
             study.outputs.put(colorOptionName, String.valueOf(view.getTag()));
         }
     }
 
     private void bindStudyOptions(StudyParameter[] array, final Map<String, Object> studyParams) {
         for (final StudyParameter parameter : array) {
-            if (parameter.color != null) {
-                if (studyParams.containsKey(parameter.name)) {
+            String heading = parameter.heading;
+            String parameterColorValue = studyParameterColors.get(heading);
+            // get the study parameter color, which has another fieldName from the heading in the parameter
+            if(parameterColorValue != null) {
+                HashMap<String, Object> oldParameters = (HashMap<String, Object>) study.parameters;
+                for (Map.Entry<String,Object> entry : oldParameters.entrySet()) {
+                    if (entry.getKey().equals(parameterColorValue)) {
+                        parameter.color = String.valueOf(entry.getValue());
+                        break;
+                    }
+                }
+                bindColor(parameter);
+            } else if (parameter.color != null || parameter.defaultOutput != null || parameter.defaultColor != null) {
+                // get the color from the client-side Study object
+                if (studyParams != null && studyParams.containsKey(parameter.name)) {
                     parameter.color = String.valueOf(studyParams.get(parameter.name));
+                }
+                // get the color from the study definition
+                else if(parameter.color != null) {
+                    parameter.color = String.valueOf(parameter.color);
+                }
+                // get the color from the study descriptor default value
+                else if(parameter.defaultOutput != null) {
+                    parameter.color = String.valueOf(parameter.defaultOutput);
                 }
                 bindColor(parameter);
             }
 
             if (parameter.type != null) {
+                String parameterOldValue = studyParameterValues.get(heading);
+                Object parameterNewValue = null;
+                if (parameterOldValue != null) {
+                    HashMap<String, Object> oldParameters = (HashMap<String, Object>) study.parameters;
+                    for (Map.Entry<String, Object> entry : oldParameters.entrySet()) {
+                        // ChartIQ parameter boolean follows "fieldNameEnabled" format, where the
+                        // "Enabled" is dynamically added in the library study dialog. Which
+                        // is not accessible on the mobile side.
+                        if(entry.getValue() instanceof Boolean) {
+                            parameterOldValue += "Enabled";
+                        }
+                        if (entry.getKey().equals(parameterOldValue)) {
+                            parameterNewValue = entry.getValue();
+                            break;
+                        }
+                    }
+                }
                 switch (parameter.type) {
                     case "select":
-
                         if (studyParams.containsKey(parameter.name) && !"field".equals(studyParams.get(parameter.name))) {
                             parameter.value = studyParams.get(parameter.name);
                             if(parameter.value.getClass() == ArrayList.class){
@@ -165,20 +215,28 @@ public class StudyOptionsActivity extends AppCompatActivity {
                         bindSelect(parameter);
                         break;
                     case "number":
-                        if (studyParams.containsKey(parameter.name)) {
+                        if(parameterNewValue != null) {
+                            parameter.value = parameterNewValue;
+                        } else if (studyParams.containsKey(parameter.name)) {
                             parameter.value = studyParams.get(parameter.name);
                         }
                         bindNumber(studyParams, parameter);
                         break;
                     case "text":
-                        if (studyParams.containsKey(parameter.name)) {
-                            parameter.value = studyParams.get(parameter.name);
+                        if(parameterNewValue != null) {
+                            parameter.value = parameterNewValue;
+                        } else {
+                            if (studyParams.containsKey(parameter.name)) {
+                                parameter.value = studyParams.get(parameter.name);
+                            }
                         }
                         bindString(studyParams, parameter);
                         break;
                     case "checkbox":
-                        if (studyParams.containsKey(parameter.name)) {
-                            parameter.value = studyParams.get(parameter.name);
+                        if(parameterNewValue != null) {
+                            parameter.value = parameterNewValue;
+                        } else if (studyParams.containsKey(parameter.name)) {
+                            parameter.value = studyParams.get(parameter.name) + "Enabled";
                         }
                         bindBoolean(studyParams, parameter);
                         break;
@@ -215,7 +273,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
         switchView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                studyParams.put(parameter.name, switchView.isChecked());
+                String parameterValue = studyParameterValues.get(parameter.heading);
+                if(parameterValue != null) {
+                    changeStudyParameter(parameterValue + "Enabled", study, switchView.isChecked());
+                } else {
+                    studyParams.put(parameter.name, switchView.isChecked());
+                }
             }
         });
     }
@@ -235,7 +298,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                studyParams.put(parameter.name, editText.getText().toString());
+                String parameterValue = studyParameterValues.get(parameter.heading);
+                if(parameterValue != null) {
+                    changeStudyParameter(parameterValue, study, editText.getText().toString());
+                } else {
+                    studyParams.put(parameter.name, editText.getText().toString());
+                }
             }
 
             @Override
@@ -243,6 +311,26 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    /**
+     * Helper method to ensure that the correct study parameter value is added to the client side study object
+     * @param parameterName
+     * @param study
+     * @param value
+     */
+    private void changeStudyParameter(String parameterName, Study study, Object value) {
+        Map<String, Object> currentParameters = (Map<String, Object>) study.parameters.get("init");
+        if(currentParameters == null) {
+            currentParameters = study.parameters;
+        }
+        for (Map.Entry<String,Object> entry : currentParameters.entrySet()) {
+            if (entry.getKey().equals(parameterName)) {
+                currentParameters.put(entry.getKey(), value);
+                break;
+            }
+        }
+        study.parameters = currentParameters; // replace with potential new values
     }
 
     private void bindColor(final StudyParameter parameter) {
@@ -260,7 +348,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
         });
         if ("auto".equals(parameter.color)) {
             color.setBackgroundColor(Color.BLACK);
-        } else {
+        } else if(parameter.color != null){
             try{
                 if(parameter.color.contains("rgb")) {
                     String subString = parameter.color.substring(parameter.color.indexOf('(') + 1, parameter.color.indexOf(')'));
@@ -284,6 +372,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
             }catch(Exception e) {
                 e.printStackTrace();
             }
+        } else if(parameter.defaultColor != null) {
+            if ("auto".equals(parameter.defaultColor)) {
+                color.setBackgroundColor(Color.BLACK);
+            } else {
+                color.setBackgroundColor(Color.parseColor(String.valueOf(parameter.defaultColor)));
+            }
         }
     }
 
@@ -302,7 +396,12 @@ public class StudyOptionsActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                studyParams.put(parameter.name, editText.getText().toString());
+                String parameterValue = studyParameterValues.get(parameter.heading);
+                if(parameterValue != null) {
+                    changeStudyParameter(parameterValue, study, editText.getText().toString());
+                } else {
+                    studyParams.put(parameter.name, editText.getText().toString());
+                }
             }
 
             @Override
