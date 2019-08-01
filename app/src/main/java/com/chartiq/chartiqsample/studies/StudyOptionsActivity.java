@@ -346,39 +346,52 @@ public class StudyOptionsActivity extends AppCompatActivity {
                 colorOptionName = parameter.heading;
             }
         });
-        if ("auto".equals(parameter.color)) {
-            color.setBackgroundColor(Color.BLACK);
-        } else if(parameter.color != null){
-            try{
+        // check the parameter color field first then the default field
+        // if both are null then the study is not fully defined
+        if(parameter.color != null) {
+            if ("auto".equals(parameter.color)) {
+                color.setBackgroundColor(Color.BLACK);
+            } else {
                 if(parameter.color.contains("rgb")) {
-                    String subString = parameter.color.substring(parameter.color.indexOf('(') + 1, parameter.color.indexOf(')'));
-                    String rgbColors[] = subString.split(",");
-                    int parsedColor = 0;
-                    int alphaValue = 255;
-
-                    // contains an alpha value
-                    if(rgbColors.length == 4) {
-                        double value = Double.parseDouble(rgbColors[3].trim());
-                        value = Math.floor(value >= 1.0 ? 255 : value * 256.0); // use 256 for floating point precision when value is less than 1.0
-                        alphaValue = (int) value;
-                    }
-                    parsedColor = Color.argb(alphaValue, Integer.parseInt(rgbColors[0].trim()),
-                            Integer.parseInt(rgbColors[1].trim()), Integer.parseInt(rgbColors[2].trim()));
-
-                    color.setBackgroundColor(parsedColor);
+                    color.setBackgroundColor(convertRGB(parameter.color));
                 } else {
                     color.setBackgroundColor(Color.parseColor(parameter.color));
                 }
-            }catch(Exception e) {
-                e.printStackTrace();
             }
         } else if(parameter.defaultColor != null) {
             if ("auto".equals(parameter.defaultColor)) {
                 color.setBackgroundColor(Color.BLACK);
             } else {
-                color.setBackgroundColor(Color.parseColor(String.valueOf(parameter.defaultColor)));
+                if(parameter.defaultColor.contains("rgb")) {
+                    color.setBackgroundColor(convertRGB(parameter.defaultColor));
+                } else {
+                    color.setBackgroundColor(Color.parseColor(parameter.defaultColor));
+                }
             }
         }
+    }
+
+    /**
+     * Helper method to convert an rgb color code
+     * @param color
+     * @return int Color code
+     */
+    private int convertRGB(String color) {
+        String subString = color.substring(color.indexOf('(') + 1, color.indexOf(')'));
+        String rgbColors[] = subString.split(",");
+        int parsedColor = 0;
+        int alphaValue = 255;
+
+        // contains an alpha value
+        if(rgbColors.length == 4) {
+            double value = Double.parseDouble(rgbColors[3].trim());
+            value = Math.floor(value >= 1.0 ? 255 : value * 256.0); // use 256 for floating point precision when value is less than 1.0
+            alphaValue = (int) value;
+        }
+        parsedColor = Color.argb(alphaValue, Integer.parseInt(rgbColors[0].trim()),
+                Integer.parseInt(rgbColors[1].trim()), Integer.parseInt(rgbColors[2].trim()));
+
+        return parsedColor;
     }
 
     private void bindNumber(final Map<String, Object> studyParams, final StudyParameter parameter) {

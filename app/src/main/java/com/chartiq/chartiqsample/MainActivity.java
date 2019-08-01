@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int STUDIES_REQUEST_CODE = 2;
     private static final int CHART_OPTIONS_REQUEST_CODE = 3;
     private static final String defaultSymbol = "AAPL";
-    public static final String chartUrl ="http://192.168.1.147/default/sample-template-native-sdk.html";
+    public static final String chartUrl = "http://yourdeployment/sample-template-native-sdk.html";
     ChartIQ chartIQ;
 
     //top toolbar
