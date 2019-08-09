@@ -90,11 +90,6 @@ public class StudiesActivity extends AppCompatActivity {
         }
         if (getIntent().hasExtra(ACTIVE_STUDIES)) {
             activeStudies = (ArrayList<Study>) getIntent().getExtras().getSerializable(ACTIVE_STUDIES);
-            if (activeStudies != null) {
-                for (Study s : activeStudies) {
-                    chartIQ.addStudy(s, false);
-                }
-            }
             Collections.sort(activeStudies, new Comparator<Study>() {
                 @Override
                 public int compare(Study o1, Study o2) {
@@ -165,10 +160,15 @@ public class StudiesActivity extends AppCompatActivity {
                 for (Study s : lastSelection) {
                     chartIQ.addStudy(s, true);
                 }
-                activeStudies.addAll(lastSelection);
-                studiesAdapter.setActiveStudiesList(activeStudies);
-                studiesAdapter.getAvailableStudies().removeAll(lastSelection);
-                clearSelection();
+
+                chartIQ.getActiveStudies().then(new Promise.Callback<Study[]>() {
+                    @Override
+                    public void call(Study[] studies) {
+                        activeStudies.addAll(lastSelection);
+                        studiesAdapter.setActiveStudiesList(activeStudies);
+                        clearSelection();
+                    }
+                });
             }
         });
         removeButton = findViewById(R.id.remove_button);
@@ -218,15 +218,15 @@ public class StudiesActivity extends AppCompatActivity {
                     for (final Study s : activeStudiesList) {
                         if (s.shortName.equals(clickedStudy.shortName) || s.type.equals(clickedStudy.shortName) || s.type.equals(clickedStudy.type)) {
                             String name = s.type != null ? s.type : s.shortName;
-                            chartIQ.getStudyOutputParameters(name).than(new Promise.Callback<String>() {
+                            chartIQ.getStudyOutputParameters(name).then(new Promise.Callback<String>() {
                                 String name = s.type != null ? s.type : s.shortName;
 
                                 @Override
                                 public void call(final String outputs) {
-                                    chartIQ.getStudyInputParameters(name).than(new Promise.Callback<String>() {
+                                    chartIQ.getStudyInputParameters(name).then(new Promise.Callback<String>() {
                                         @Override
                                         public void call(final String inputs) {
-                                            chartIQ.getStudyParameters(name).than(new Promise.Callback<String>() {
+                                            chartIQ.getStudyParameters(name).then(new Promise.Callback<String>() {
                                                 @Override
                                                 public void call(final String parameters) {
                                                     Intent studyOptionsIntent = new Intent(StudiesActivity.this, StudyOptionsActivity.class);
