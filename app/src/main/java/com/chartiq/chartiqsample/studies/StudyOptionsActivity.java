@@ -36,10 +36,10 @@ public class StudyOptionsActivity extends AppCompatActivity {
     TextView studyTitle;
     Toolbar toolbar;
     Study study;
-    HashMap<String, Object> defaultInputs = new HashMap<>();
-    HashMap<String, Object> defaultOutputs = new HashMap<>();
-    HashMap<String, String> studyParameterColors = new HashMap<>();
-    HashMap<String, String> studyParameterValues = new HashMap<>();
+    private HashMap<String, Object> defaultInputs = new HashMap<>();
+    private HashMap<String, Object> defaultOutputs = new HashMap<>();
+    private HashMap<String, String> studyParameterColors = new HashMap<>();
+    private HashMap<String, String> studyParameterValues = new HashMap<>();
     LinearLayout optionsLayout;
     private PopupWindow colorPalette;
     private RecyclerView colorRecycler;
@@ -252,7 +252,19 @@ public class StudyOptionsActivity extends AppCompatActivity {
         optionName.setText(parameter.heading);
         final TextView textView = (TextView) v.findViewById(R.id.value);
         selectView = textView;
-        textView.setText(String.valueOf(parameter.value));
+        String displayText = (String) parameter.value;
+        boolean initialLoad = false;
+
+        // moving average initial value will always be 'ma' from a default ChartIQ library entry
+        // be sure to use the defaultInput value in this case
+        if(parameter.heading.contains("Moving Average") && parameter.value.equals("ma")) {
+            displayText = (String) parameter.defaultInput;
+        }
+        // If there are display mappings be sure to get the correct display value
+        if(parameter.options != null && parameter.options.size() > 0) {
+            displayText = (String) parameter.options.get(displayText);
+        }
+        textView.setText(displayText);
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -472,7 +484,18 @@ public class StudyOptionsActivity extends AppCompatActivity {
                 StudyParameter parameter = (StudyParameter) data.getSerializableExtra("parameter");
                 String value = data.getStringExtra("chosenValue");
                 if (parameter.defaultInput != null) {
-                    study.inputs.put(parameter.name, value);
+                    // it is a moving average, and options exist, get the mapped key value as that is the value needed by the study
+                    if (parameter.heading.contains("Moving Average") && parameter.options != null) {
+                        for (HashMap.Entry<String, Object> entry : parameter.options.entrySet()) {
+                            if(entry.getValue().equals(value)){
+                                String key = (String) entry.getKey();
+                                study.inputs.put(parameter.name, key);
+                                break;
+                            }
+                        }
+                    } else {
+                        study.inputs.put(parameter.name, value);
+                    }
                 } else {
                     study.outputs.put(parameter.name, value);
                 }
