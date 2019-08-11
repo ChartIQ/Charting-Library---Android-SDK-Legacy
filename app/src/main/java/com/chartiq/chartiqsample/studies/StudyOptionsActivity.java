@@ -253,7 +253,6 @@ public class StudyOptionsActivity extends AppCompatActivity {
         final TextView textView = (TextView) v.findViewById(R.id.value);
         selectView = textView;
         String displayText = (String) parameter.value;
-        boolean initialLoad = false;
 
         // moving average initial value will always be 'ma' from a default ChartIQ library entry
         // be sure to use the defaultInput value in this case
