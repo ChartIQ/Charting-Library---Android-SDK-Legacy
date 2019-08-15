@@ -40,6 +40,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
     private HashMap<String, Object> defaultOutputs = new HashMap<>();
     private HashMap<String, String> studyParameterColors = new HashMap<>();
     private HashMap<String, String> studyParameterValues = new HashMap<>();
+    private HashMap<String, String> movingAverageAbbr = new HashMap<>();
     LinearLayout optionsLayout;
     private PopupWindow colorPalette;
     private RecyclerView colorRecycler;
@@ -69,6 +70,14 @@ public class StudyOptionsActivity extends AppCompatActivity {
         studyParameterValues.put("OverBought", "studyOverBoughtValue");
         studyParameterValues.put("OverSold", "studyOverSoldValue");
         studyParameterValues.put("Show Zones", "studyOverZones");
+        movingAverageAbbr.put("ma", "simple");
+        movingAverageAbbr.put("ema", "exponential");
+        movingAverageAbbr.put("tsma", "time series");
+        movingAverageAbbr.put("tma", "triangular");
+        movingAverageAbbr.put("vma", "variable");
+        movingAverageAbbr.put("vdma", "VIDYA");
+        movingAverageAbbr.put("wma", "weighted");
+        movingAverageAbbr.put("smma", "welles wilder");
 
         if (getIntent().hasExtra("study")) {
             study = (Study) getIntent().getSerializableExtra("study");
@@ -254,11 +263,14 @@ public class StudyOptionsActivity extends AppCompatActivity {
         selectView = textView;
         String displayText = (String) parameter.value;
 
-        // moving average initial value will always be 'ma' from a default ChartIQ library entry
-        // be sure to use the defaultInput value in this case
-        if(parameter.heading.contains("Moving Average") && parameter.value.equals("ma")) {
-            displayText = (String) parameter.defaultInput;
+        // if a moving average value is abbreviated then use the default input
+        if(parameter.heading.contains("Moving Average") || parameter.heading.equals("Type")) {
+            String movingAverageValue = movingAverageAbbr.get(displayText);
+            if(movingAverageValue != null) {
+                displayText = (String) parameter.defaultInput;
+            }
         }
+
         // If there are display mappings be sure to get the correct display value
         if(parameter.options != null && parameter.options.size() > 0) {
             displayText = (String) parameter.options.get(displayText);
@@ -484,7 +496,7 @@ public class StudyOptionsActivity extends AppCompatActivity {
                 String value = data.getStringExtra("chosenValue");
                 if (parameter.defaultInput != null) {
                     // it is a moving average, and options exist, get the mapped key value as that is the value needed by the study
-                    if (parameter.heading.contains("Moving Average") && parameter.options != null) {
+                    if ((parameter.heading.contains("Moving Average") || parameter.heading.equals("Type")) && parameter.options != null) {
                         for (HashMap.Entry<String, Object> entry : parameter.options.entrySet()) {
                             if(entry.getValue().equals(value)){
                                 String key = (String) entry.getKey();
