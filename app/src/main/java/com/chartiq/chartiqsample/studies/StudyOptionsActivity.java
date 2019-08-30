@@ -286,6 +286,11 @@ public class StudyOptionsActivity extends AppCompatActivity {
             }
         }
 
+        // default value for Field is actually field, which is normally handled in the Charting library but needs to be handled here
+        if(parameter.name.toLowerCase().equals("field") && displayText.toLowerCase().equals("field")) {
+            displayText = "Close";
+        }
+
         // If there are display mappings be sure to get the correct display value
         if(parameter.options != null && parameter.options.size() > 0) {
             displayText = (String) parameter.options.get(displayText);
