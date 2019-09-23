@@ -230,6 +230,8 @@ public class ChartIQ extends WebView {
 				setWebViewClient(new WebViewClient() {
 					public void onPageFinished(WebView view, String url) {
 						executeJavascript("nativeQuoteFeed(parameters, cb)", null);
+						executeJavascript("addDrawingListener()");
+						executeJavascript("addLayoutListener()");
 
 						if (callbackStart != null) {
 							callbackStart.onStart();
