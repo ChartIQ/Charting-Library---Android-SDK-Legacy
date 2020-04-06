@@ -14,6 +14,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.chartiq.sdk.model.Hud;
 import com.chartiq.sdk.model.OHLCChart;
 import com.chartiq.sdk.model.Study;
 import com.google.gson.Gson;
@@ -529,6 +530,29 @@ public class ChartIQ extends WebView {
 	public void disableCrosshairs() {
 		executeJavascript("enableCrosshairs(false);", toastCallback);
 		addEvent(new Event("CHIQ_disableCrosshairs"));
+	}
+
+	public Promise<Hud> getCrosshairsHUDDetail() {
+		String script = "getHudDetails();";
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			final Promise<Hud> promise = new Promise<>();
+			executeJavascript(script, new ValueCallback<String>() {
+				@Override
+				public void onReceiveValue(String value) {
+					if (value.equalsIgnoreCase("null")) {
+						value = "";
+					}
+					promise.setResult(new Gson().fromJson(value, Hud.class));
+				}
+			});
+			return promise;
+		} else {
+			final Promise<Hud> promise = new Promise<>();
+			promises.add(promise);
+			loadUrl("javascript:" + script);
+			loadUrl("javascript:promises.setPromiseResult(" + promises.indexOf(promise) + ", JSON.stringify(result))");
+			return promise;
+		}
 	}
 
 	/**
