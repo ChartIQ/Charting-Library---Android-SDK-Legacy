@@ -508,12 +508,20 @@ public class ChartIQ extends WebView {
 	}
 
 	/**
-	 *
+	 * Removes the active study that matches the supplied studyName
 	 * @param studyName
 	 */
 	public void removeStudy(String studyName) {
 		executeJavascript("removeStudy(\"" + studyName + "\");", toastCallback);
 		addEvent(new Event("CHIQ_removeStudy"));
+	}
+
+	/**
+	 * Removes all the active studies
+	 */
+	public void removeAllStudies() {
+		executeJavascript("removeAllStudies();", toastCallback);
+		addEvent(new Event("CHIQ_removeAllStudies"));
 	}
 
 	/**
