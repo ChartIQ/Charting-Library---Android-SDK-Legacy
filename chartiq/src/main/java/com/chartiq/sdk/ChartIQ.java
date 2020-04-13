@@ -533,6 +533,22 @@ public class ChartIQ extends WebView {
 	}
 
 	/**
+	 * Checks to see if the crosshair is turned on or off
+	 * @return Promise<Boolean>
+	 */
+	public Promise<Boolean> isCrosshairsEnabled() {
+		final Promise<Boolean> promise = new Promise<>();
+		String script = CHART_IQ_JS_OBJECT + ".layout.crosshair";
+		executeJavascript(script, new ValueCallback<String>() {
+			@Override
+			public void onReceiveValue(String value) {
+				promise.setResult(new Boolean(value));
+			}
+		});
+		return promise;
+	}
+
+	/**
 	 *
 	 */
 	public void disableCrosshairs() {
