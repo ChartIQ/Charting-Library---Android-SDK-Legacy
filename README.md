@@ -5,7 +5,9 @@ This SDK has been designed to support a [basic application](https://github.com/C
 
 ## Requirements
 
-- A valid version of the ChartIQ library (version 7.0.5 &ndash; 7.5.0). Please contact info@cosaic.io if you do not already have a license or evaluation version.
+- Version 7.0.5 to 7.5.0 of the ChartIQ library. Support for version 8.0.0 coming soon.
+
+  Please contact info@cosaic.io if you do not already have a license or evaluation version of the library.
 
 ## Sample app
 
