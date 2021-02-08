@@ -6,7 +6,7 @@ This SDK has been designed to support a [basic application](https://github.com/C
 
 **End of support**
 
-Support for this SDK ended as of Version 8.2.0 of the ChartIQ library. Please use the [ChartIQ-Android-SDK](https://github.com/ChartIQ/ChartIQ-Android-SDK) instead.
+Support for this SDK ended as of Version 8.0.0 of the ChartIQ library. Please use the [ChartIQ-Android-SDK](https://github.com/ChartIQ/ChartIQ-Android-SDK) instead.
 
 ## Requirements
 
