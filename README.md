@@ -4,7 +4,7 @@ Native Android SDK for the [ChartIQ JavaScript library](https://documentation.ch
 
 This SDK has been designed to support a [basic application](https://github.com/ChartIQ/Charting-Library---Android-Sample-App-Legacy) and may need to be extended to support more elaborate implementations, which can be done by adding code to invoke JavaScript functions directly.
 
-See the [Starting on Mobile: Android - Legacy](https://documentation.chartiq.com/tutorial-Starting%20on%20Android%20-%20Legacy.html) tutorial for instruction on using this SDK.
+See the [Getting Started on Mobile: Android - Legacy](https://documentation.chartiq.com/tutorial-Starting%20on%20Android%20-%20Legacy.html) tutorial for instruction on using this SDK.
 
 **End of support**
 
